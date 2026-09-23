@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="600" viewBox="0 0 1400 600">
+  <rect width="1400" height="600" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">实验验证的四级阶梯</text>
+  <text x="70" y="106" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">越往后成本越高，但前一级没有通过时，不应直接进入后一级</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="90" y="430" width="250" height="90" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="215" y="470" font-size="23" font-weight="700" fill="#194c4b">1. 静态检查</text><text x="215" y="500" font-size="18" fill="#194c4b">导入 / 配置 / 路径</text>
+    <rect x="390" y="345" width="250" height="90" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="515" y="385" font-size="23" font-weight="700" fill="#1f4d7a">2. 单元测试</text><text x="515" y="415" font-size="18" fill="#1f4d7a">对齐 / mask / 指标</text>
+    <rect x="690" y="260" width="250" height="90" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="815" y="300" font-size="23" font-weight="700" fill="#7a4c10">3. Smoke test</text><text x="815" y="330" font-size="18" fill="#7a4c10">小数据跑通全流程</text>
+    <rect x="990" y="175" width="300" height="90" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="1140" y="215" font-size="23" font-weight="700" fill="#64316c">4. 正式实验</text><text x="1140" y="245" font-size="18" fill="#64316c">固定配置并独立评估</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M340 465 L380 400 M640 380 L680 315 M940 295 L980 230"/><path d="M365 398 L390 385 L378 415 M665 313 L690 300 L678 330 M965 228 L990 215 L978 245"/></g>
+  <text x="700" y="555" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">Smoke test 不是正式结果，它只证明从数据读取到评估的链路可以运行</text>
+</svg>

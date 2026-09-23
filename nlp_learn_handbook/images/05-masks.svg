@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700">
+  <rect width="1400" height="700" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">注意力 mask：可见范围由任务决定</text>
+  <text x="70" y="105" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">绿色表示允许读取，浅灰表示被 mask；padding mask 与 causal mask 解决不同问题</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <text x="345" y="170" font-size="26" font-weight="700" fill="#1f4d7a">BERT Encoder：非因果</text>
+    <text x="345" y="205" font-size="18" fill="#526579">每个有效位置可读取前后文</text>
+    <text x="880" y="170" font-size="26" font-weight="700" fill="#7a4c10">GPT / Decoder：causal</text>
+    <text x="880" y="205" font-size="18" fill="#526579">位置 t 不能读取未来位置</text>
+  </g>
+  <g transform="translate(190 240)">
+    <rect width="310" height="310" fill="#ffffff" stroke="#9aa9b8" stroke-width="2"/>
+    <g stroke="#ffffff" stroke-width="3">
+      <rect x="0" y="0" width="62" height="62" fill="#58a69f"/><rect x="62" y="0" width="62" height="62" fill="#58a69f"/><rect x="124" y="0" width="62" height="62" fill="#58a69f"/><rect x="186" y="0" width="62" height="62" fill="#58a69f"/><rect x="248" y="0" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="62" width="62" height="62" fill="#58a69f"/><rect x="62" y="62" width="62" height="62" fill="#58a69f"/><rect x="124" y="62" width="62" height="62" fill="#58a69f"/><rect x="186" y="62" width="62" height="62" fill="#58a69f"/><rect x="248" y="62" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="124" width="62" height="62" fill="#58a69f"/><rect x="62" y="124" width="62" height="62" fill="#58a69f"/><rect x="124" y="124" width="62" height="62" fill="#58a69f"/><rect x="186" y="124" width="62" height="62" fill="#58a69f"/><rect x="248" y="124" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="186" width="62" height="62" fill="#58a69f"/><rect x="62" y="186" width="62" height="62" fill="#58a69f"/><rect x="124" y="186" width="62" height="62" fill="#58a69f"/><rect x="186" y="186" width="62" height="62" fill="#58a69f"/><rect x="248" y="186" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="248" width="62" height="62" fill="#dce3e9"/><rect x="62" y="248" width="62" height="62" fill="#dce3e9"/><rect x="124" y="248" width="62" height="62" fill="#dce3e9"/><rect x="186" y="248" width="62" height="62" fill="#dce3e9"/><rect x="248" y="248" width="62" height="62" fill="#dce3e9"/>
+    </g>
+    <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="16" fill="#526579" text-anchor="middle"><text x="31" y="335">t1</text><text x="93" y="335">t2</text><text x="155" y="335">t3</text><text x="217" y="335">t4</text><text x="279" y="335">pad</text><text x="-28" y="37">t1</text><text x="-28" y="99">t2</text><text x="-28" y="161">t3</text><text x="-28" y="223">t4</text><text x="-28" y="285">pad</text></g>
+  </g>
+  <g transform="translate(725 240)">
+    <rect width="310" height="310" fill="#ffffff" stroke="#9aa9b8" stroke-width="2"/>
+    <g stroke="#ffffff" stroke-width="3">
+      <rect x="0" y="0" width="62" height="62" fill="#d18c2f"/><rect x="62" y="0" width="62" height="62" fill="#dce3e9"/><rect x="124" y="0" width="62" height="62" fill="#dce3e9"/><rect x="186" y="0" width="62" height="62" fill="#dce3e9"/><rect x="248" y="0" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="62" width="62" height="62" fill="#d18c2f"/><rect x="62" y="62" width="62" height="62" fill="#d18c2f"/><rect x="124" y="62" width="62" height="62" fill="#dce3e9"/><rect x="186" y="62" width="62" height="62" fill="#dce3e9"/><rect x="248" y="62" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="124" width="62" height="62" fill="#d18c2f"/><rect x="62" y="124" width="62" height="62" fill="#d18c2f"/><rect x="124" y="124" width="62" height="62" fill="#d18c2f"/><rect x="186" y="124" width="62" height="62" fill="#dce3e9"/><rect x="248" y="124" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="186" width="62" height="62" fill="#d18c2f"/><rect x="62" y="186" width="62" height="62" fill="#d18c2f"/><rect x="124" y="186" width="62" height="62" fill="#d18c2f"/><rect x="186" y="186" width="62" height="62" fill="#d18c2f"/><rect x="248" y="186" width="62" height="62" fill="#dce3e9"/>
+      <rect x="0" y="248" width="62" height="62" fill="#dce3e9"/><rect x="62" y="248" width="62" height="62" fill="#dce3e9"/><rect x="124" y="248" width="62" height="62" fill="#dce3e9"/><rect x="186" y="248" width="62" height="62" fill="#dce3e9"/><rect x="248" y="248" width="62" height="62" fill="#dce3e9"/>
+    </g>
+    <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="16" fill="#526579" text-anchor="middle"><text x="31" y="335">t1</text><text x="93" y="335">t2</text><text x="155" y="335">t3</text><text x="217" y="335">t4</text><text x="279" y="335">pad</text><text x="-28" y="37">t1</text><text x="-28" y="99">t2</text><text x="-28" y="161">t3</text><text x="-28" y="223">t4</text><text x="-28" y="285">pad</text></g>
+  </g>
+  <rect x="270" y="615" width="860" height="48" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="647" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#374b60">padding mask：排除补齐位置；causal mask：排除未来位置；两者可以同时存在</text>
+</svg>

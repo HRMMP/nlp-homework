@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">Encoder-Decoder Transformer 的数据流</text>
+  <text x="70" y="105" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">Encoder 建立源句上下文；Decoder 用目标前缀并通过 cross-attention 读取源句</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="80" y="175" width="260" height="90" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="210" y="215" font-size="24" font-weight="700" fill="#194c4b">源 token ids</text>
+    <text x="210" y="247" font-size="19" fill="#194c4b">+ embedding + 位置</text>
+    <rect x="80" y="335" width="260" height="180" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
+    <text x="210" y="380" font-size="25" font-weight="700" fill="#1f4d7a">Encoder × N</text>
+    <text x="210" y="422" font-size="19" fill="#1f4d7a">self-attention</text>
+    <text x="210" y="455" font-size="19" fill="#1f4d7a">FFN + 残差 + LayerNorm</text>
+    <text x="210" y="488" font-size="19" fill="#1f4d7a">输出源上下文表示</text>
+    <rect x="80" y="585" width="260" height="90" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="210" y="625" font-size="24" font-weight="700" fill="#194c4b">目标前缀 ids</text>
+    <text x="210" y="657" font-size="19" fill="#194c4b">+ embedding + 位置</text>
+    <rect x="535" y="300" width="310" height="250" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="690" y="345" font-size="25" font-weight="700" fill="#7a4c10">Decoder × N</text>
+    <text x="690" y="389" font-size="19" fill="#7a4c10">causal self-attention</text>
+    <text x="690" y="427" font-size="19" fill="#7a4c10">cross-attention</text>
+    <text x="690" y="465" font-size="19" fill="#7a4c10">FFN + 残差 + LayerNorm</text>
+    <text x="690" y="507" font-size="19" fill="#7a4c10">读取 Encoder 表示</text>
+    <rect x="1040" y="380" width="260" height="100" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/>
+    <text x="1170" y="423" font-size="24" font-weight="700" fill="#64316c">线性层</text>
+    <text x="1170" y="458" font-size="20" fill="#64316c">目标词表 logits</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M210 265 V325 M210 515 V575"/>
+    <path d="M210 315 L210 335 M210 565 L210 585"/>
+    <path d="M340 425 H525 M845 425 H1030"/>
+    <path d="M510 415 L535 425 L510 435 M1015 415 L1040 425 L1015 435"/>
+    <path d="M340 220 C470 220 470 350 525 350" stroke="#3a9d96" stroke-dasharray="10 10"/>
+    <path d="M340 630 C470 630 470 500 535 500" stroke="#d18c2f" stroke-dasharray="10 10"/>
+    <path d="M340 425 C420 425 420 555 535 555" stroke="#4d82bd" stroke-dasharray="10 10"/>
+  </g>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="18" fill="#526579">
+    <text x="370" y="205">源输入</text>
+    <text x="365" y="615">目标输入</text>
+    <text x="410" y="410">Encoder 输出供 cross-attention 读取</text>
+  </g>
+  <rect x="405" y="735" width="590" height="66" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="777" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">训练时目标输入与标签错开一位；推理时逐步生成</text>
+</svg>

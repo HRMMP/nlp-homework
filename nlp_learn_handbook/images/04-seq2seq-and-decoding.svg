@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="880" viewBox="0 0 1400 880">
+  <rect width="1400" height="880" fill="#f7fafc"/>
+  <text x="70" y="62" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">Seq2Seq：训练与推理使用不同的前缀</text>
+  <text x="70" y="104" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">训练时可用真实目标前缀并行计算；推理时只能接回模型自己的预测</text>
+  <line x1="70" y1="145" x2="1330" y2="145" stroke="#c9d4df" stroke-width="2"/>
+  <text x="90" y="190" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="27" font-weight="700" fill="#1f4d7a">训练：teacher forcing</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="90" y="235" width="220" height="88" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="200" y="273" font-size="23" font-weight="700" fill="#194c4b">源句</text>
+    <text x="200" y="304" font-size="19" fill="#194c4b">我 喜欢 猫</text>
+    <rect x="390" y="235" width="250" height="88" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
+    <text x="515" y="273" font-size="23" font-weight="700" fill="#1f4d7a">Encoder</text>
+    <text x="515" y="304" font-size="19" fill="#1f4d7a">源序列表示</text>
+    <rect x="720" y="215" width="300" height="128" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="870" y="255" font-size="23" font-weight="700" fill="#7a4c10">Decoder 输入</text>
+    <text x="870" y="291" font-size="20" fill="#7a4c10">&lt;bos&gt; 我 喜欢 猫</text>
+    <text x="870" y="321" font-size="18" fill="#7a4c10">真实目标前缀</text>
+    <rect x="1100" y="235" width="220" height="88" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/>
+    <text x="1210" y="273" font-size="23" font-weight="700" fill="#64316c">标签</text>
+    <text x="1210" y="304" font-size="19" fill="#64316c">我 喜欢 猫 &lt;eos&gt;</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M310 279 H380 M640 279 H710 M1020 279 H1090"/>
+    <path d="M370 269 L390 279 L370 289 M700 269 L720 279 L700 289 M1080 269 L1100 279 L1080 289"/>
+  </g>
+  <text x="90" y="430" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="27" font-weight="700" fill="#7a4c10">推理：自回归生成</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="100" y="495" width="180" height="88" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="190" y="533" font-size="22" font-weight="700" fill="#7a4c10">第 1 步</text>
+    <text x="190" y="564" font-size="20" fill="#7a4c10">&lt;bos&gt; -> 我</text>
+    <rect x="390" y="495" width="220" height="88" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="500" y="533" font-size="22" font-weight="700" fill="#7a4c10">第 2 步</text>
+    <text x="500" y="564" font-size="20" fill="#7a4c10">&lt;bos&gt; 我 -> 喜欢</text>
+    <rect x="720" y="495" width="250" height="88" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="845" y="533" font-size="22" font-weight="700" fill="#7a4c10">第 3 步</text>
+    <text x="845" y="564" font-size="20" fill="#7a4c10">... 喜欢 -> 猫</text>
+    <rect x="1080" y="495" width="240" height="88" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/>
+    <text x="1200" y="533" font-size="22" font-weight="700" fill="#35592f">停止条件</text>
+    <text x="1200" y="564" font-size="20" fill="#35592f">生成 &lt;eos&gt; 或到上限</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M280 539 H380 M610 539 H710 M970 539 H1070"/>
+    <path d="M370 529 L390 539 L370 549 M700 529 L720 539 L700 549 M1060 529 L1080 539 L1060 549"/>
+    <path d="M500 595 C500 675 190 675 190 595 M845 595 C845 735 500 735 500 595" stroke="#9aa9b8" stroke-dasharray="10 10"/>
+  </g>
+  <rect x="270" y="770" width="860" height="58" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="807" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">训练和推理的前缀来源不同，因此必须分别检查训练损失与真实生成结果</text>
+</svg>

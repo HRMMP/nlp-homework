@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="680" viewBox="0 0 1400 680">
+  <rect width="1400" height="680" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">两个先修重点：概率转换与张量形状</text>
+  <text x="70" y="108" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">logits 不是概率；矩阵乘法是否成立，要看相邻维度能否对齐</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <text x="350" y="170" font-size="26" font-weight="700" fill="#1f4d7a">Softmax：logits -> 概率</text>
+    <rect x="80" y="210" width="230" height="105" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="195" y="255" font-size="23" font-weight="700" fill="#1f4d7a">logits</text><text x="195" y="288" font-size="20" fill="#1f4d7a">[2.0, 1.0, 0.0]</text>
+    <rect x="390" y="210" width="230" height="105" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="505" y="255" font-size="23" font-weight="700" fill="#7a4c10">指数与归一化</text><text x="505" y="288" font-size="19" fill="#7a4c10">exp(z) / sum exp(z)</text>
+    <rect x="700" y="210" width="230" height="105" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/><text x="815" y="255" font-size="23" font-weight="700" fill="#35592f">概率</text><text x="815" y="288" font-size="20" fill="#35592f">约 [0.665, 0.245, 0.090]</text>
+    <rect x="1010" y="210" width="300" height="105" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/><text x="1160" y="255" font-size="23" font-weight="700" fill="#374b60">检查</text><text x="1160" y="288" font-size="19" fill="#374b60">各项非负，和约等于 1</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M310 262 H380 M620 262 H690 M930 262 H1000"/><path d="M360 252 L390 262 L360 272 M670 252 L700 262 L670 272 M980 252 L1010 262 L980 272"/></g>
+  <line x1="70" y1="375" x2="1330" y2="375" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="425" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="26" font-weight="700" fill="#1f4d7a">矩阵乘法：相邻维度必须匹配</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="150" y="475" width="260" height="105" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="280" y="520" font-size="23" font-weight="700" fill="#194c4b">X</text><text x="280" y="553" font-size="20" fill="#194c4b">(B, d_in)</text>
+    <rect x="570" y="475" width="260" height="105" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="700" y="520" font-size="23" font-weight="700" fill="#7a4c10">W 的转置</text><text x="700" y="553" font-size="20" fill="#7a4c10">(d_in, d_out)</text>
+    <rect x="990" y="475" width="260" height="105" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="1120" y="520" font-size="23" font-weight="700" fill="#64316c">Y = X W^T</text><text x="1120" y="553" font-size="20" fill="#64316c">(B, d_out)</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M410 528 H560 M830 528 H980"/><path d="M540 518 L570 528 L540 538 M960 518 L990 528 L960 538"/></g>
+</svg>

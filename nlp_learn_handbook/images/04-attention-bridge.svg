@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="620" viewBox="0 0 1400 620">
+  <rect width="1400" height="620" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">Attention 如何缓解固定向量瓶颈</text>
+  <text x="70" y="108" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">Decoder 每生成一个位置，都可以重新选择要读取的源句位置</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <text x="350" y="165" font-size="25" font-weight="700" fill="#7a4c10">只有一个中间向量</text>
+    <rect x="80" y="215" width="220" height="90" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="190" y="268" font-size="22" fill="#194c4b">长源句</text>
+    <rect x="400" y="215" width="220" height="90" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="510" y="268" font-size="22" fill="#7a4c10">固定向量</text>
+    <rect x="240" y="385" width="220" height="90" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="350" y="438" font-size="22" fill="#64316c">Decoder</text>
+    <text x="350" y="530" font-size="20" fill="#526579">信息路径长，容易成为瓶颈</text>
+    <text x="1050" y="165" font-size="25" font-weight="700" fill="#1f4d7a">每一步读取不同位置</text>
+    <rect x="760" y="215" width="180" height="90" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="850" y="268" font-size="22" fill="#194c4b">源位置 1</text>
+    <rect x="990" y="215" width="180" height="90" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="1080" y="268" font-size="22" fill="#1f4d7a">源位置 2</text>
+    <rect x="1220" y="215" width="140" height="90" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="1290" y="268" font-size="22" fill="#7a4c10">位置 3</text>
+    <rect x="900" y="385" width="220" height="90" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="1010" y="438" font-size="22" fill="#64316c">当前 Decoder 状态</text>
+    <text x="1050" y="530" font-size="20" fill="#526579">权重随生成位置变化</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M300 260 H390 M510 305 C510 350 350 350 350 375"/><path d="M1010 385 C920 350 850 330 850 315 M1010 385 C1040 350 1080 330 1080 315 M1010 385 C1120 350 1290 330 1290 315"/><path d="M380 250 L400 260 L380 270 M340 365 L350 385 L360 365"/><path d="M840 305 L850 325 M1070 305 L1080 325 M1280 305 L1290 325"/></g>
+</svg>

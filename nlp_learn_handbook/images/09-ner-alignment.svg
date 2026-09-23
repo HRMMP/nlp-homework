@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#f7fafc"/>
+  <text x="70" y="65" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">BERT NER：标签对齐与实体级评估</text>
+  <text x="70" y="105" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">词级标注经过 tokenizer 后必须映射到 subword，再还原为实体集合</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="80" y="170" width="240" height="100" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="200" y="210" font-size="24" font-weight="700" fill="#194c4b">原始 token</text>
+    <text x="200" y="246" font-size="21" fill="#194c4b">张三 在 北京大学</text>
+    <rect x="410" y="170" width="250" height="100" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
+    <text x="535" y="210" font-size="24" font-weight="700" fill="#1f4d7a">词级标签</text>
+    <text x="535" y="246" font-size="21" fill="#1f4d7a">B-PER I-PER O B-ORG</text>
+    <rect x="750" y="150" width="300" height="140" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="900" y="194" font-size="24" font-weight="700" fill="#7a4c10">tokenizer</text>
+    <text x="900" y="229" font-size="20" fill="#7a4c10">[CLS] 张 三 在 北京 大学 [SEP]</text>
+    <text x="900" y="263" font-size="18" fill="#7a4c10">word_ids() 建立映射</text>
+    <rect x="1140" y="170" width="190" height="100" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/>
+    <text x="1235" y="210" font-size="24" font-weight="700" fill="#64316c">对齐标签</text>
+    <text x="1235" y="246" font-size="19" fill="#64316c">特殊位置 -> -100</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M320 220 H400 M660 220 H740 M1050 220 H1130"/>
+    <path d="M390 210 L410 220 L390 230 M730 210 L750 220 L730 230 M1120 210 L1140 220 L1120 230"/>
+  </g>
+  <rect x="125" y="370" width="1150" height="175" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="410" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" fill="#16324f">训练与评估</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="180" y="445" width="260" height="65" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="2"/>
+    <text x="310" y="486" font-size="20" fill="#1f4d7a">BERT hidden (B, L, H)</text>
+    <rect x="570" y="445" width="260" height="65" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="2"/>
+    <text x="700" y="486" font-size="20" fill="#194c4b">分类头 -> logits (B, L, C)</text>
+    <rect x="960" y="445" width="260" height="65" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="2"/>
+    <text x="1090" y="486" font-size="20" fill="#64316c">过滤 -> BIO 实体集合</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M440 478 H560 M830 478 H950"/>
+    <path d="M550 468 L570 478 L550 488 M940 468 L960 478 L940 488"/>
+  </g>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="245" y="650" width="270" height="100" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/>
+    <text x="380" y="692" font-size="24" font-weight="700" fill="#35592f">TP</text>
+    <text x="380" y="727" font-size="19" fill="#35592f">边界和类别都正确</text>
+    <rect x="565" y="650" width="270" height="100" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="700" y="692" font-size="24" font-weight="700" fill="#7a4c10">FP / FN</text>
+    <text x="700" y="727" font-size="19" fill="#7a4c10">多报、漏报或边界错误</text>
+    <rect x="885" y="650" width="270" height="100" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/>
+    <text x="1020" y="692" font-size="24" font-weight="700" fill="#64316c">P / R / F1</text>
+    <text x="1020" y="727" font-size="19" fill="#64316c">从实体集合独立计算</text>
+  </g>
+  <text x="700" y="830" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">不要用 token accuracy 代替实体级指标；保存 gold/pred 才能复算结果</text>
+</svg>

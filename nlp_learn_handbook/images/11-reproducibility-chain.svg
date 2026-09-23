@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560">
+  <rect width="1400" height="560" fill="#f7fafc"/>
+  <text x="70" y="68" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">可复现实验的证据链</text>
+  <text x="70" y="110" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">最终指标应该能沿着记录回溯到代码、配置、数据和具体预测</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="55" y="215" width="165" height="100" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="137" y="255" font-size="23" font-weight="700" fill="#194c4b">代码</text>
+    <text x="137" y="288" font-size="18" fill="#194c4b">入口与测试</text>
+    <rect x="270" y="215" width="165" height="100" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
+    <text x="352" y="255" font-size="23" font-weight="700" fill="#1f4d7a">配置</text>
+    <text x="352" y="288" font-size="18" fill="#1f4d7a">种子与超参数</text>
+    <rect x="485" y="215" width="165" height="100" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="567" y="255" font-size="23" font-weight="700" fill="#7a4c10">环境</text>
+    <text x="567" y="288" font-size="18" fill="#7a4c10">版本与硬件</text>
+    <rect x="700" y="215" width="165" height="100" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/>
+    <text x="782" y="255" font-size="23" font-weight="700" fill="#64316c">数据</text>
+    <text x="782" y="288" font-size="18" fill="#64316c">来源与划分</text>
+    <rect x="915" y="215" width="165" height="100" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/>
+    <text x="997" y="255" font-size="23" font-weight="700" fill="#35592f">日志</text>
+    <text x="997" y="288" font-size="18" fill="#35592f">loss 与指标</text>
+    <rect x="1130" y="215" width="215" height="100" rx="8" fill="#ffffff" stroke="#638a5e" stroke-width="3"/>
+    <text x="1237" y="255" font-size="23" font-weight="700" fill="#35592f">预测与报告</text>
+    <text x="1237" y="288" font-size="18" fill="#35592f">checkpoint / metrics</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M220 265 H260 M435 265 H475 M650 265 H690 M865 265 H905 M1080 265 H1120"/>
+    <path d="M250 255 L270 265 L250 275 M465 255 L485 265 L465 275 M680 255 L700 265 L680 275 M895 255 L915 265 L895 275 M1110 255 L1130 265 L1110 275"/>
+  </g>
+  <rect x="295" y="390" width="810" height="58" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="427" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">截图只能展示结果；结构化日志和逐样本文件才能支持复核与独立评估</text>
+</svg>

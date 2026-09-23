@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540">
+  <rect width="1400" height="540" fill="#f7fafc"/>
+  <text x="70" y="66" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">第 01 节总结：先修知识如何连起来</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="80" y="205" width="250" height="130" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="205" y="252" font-size="24" font-weight="700" fill="#194c4b">Python 基础</text><text x="205" y="287" font-size="19" fill="#194c4b">容器 / 文件 / 命令行</text>
+    <rect x="390" y="205" width="250" height="130" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="515" y="252" font-size="24" font-weight="700" fill="#1f4d7a">张量基础</text><text x="515" y="287" font-size="19" fill="#1f4d7a">向量 / 矩阵 / shape</text>
+    <rect x="700" y="205" width="250" height="130" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="825" y="252" font-size="24" font-weight="700" fill="#7a4c10">训练循环</text><text x="825" y="287" font-size="19" fill="#7a4c10">logits / loss / 梯度</text>
+    <rect x="1010" y="205" width="310" height="130" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="1165" y="252" font-size="24" font-weight="700" fill="#64316c">泛化与验证</text><text x="1165" y="287" font-size="19" fill="#64316c">训练 / 验证 / 测试</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M330 270 H380 M640 270 H690 M950 270 H1000"/><path d="M370 260 L390 270 L370 280 M680 260 L700 270 L680 280 M990 260 L1010 270 L990 280"/></g>
+  <rect x="250" y="405" width="900" height="60" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/><text x="700" y="443" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">核心习惯：每次运算都写 shape，每次结论都区分训练事实与泛化证据</text>
+</svg>

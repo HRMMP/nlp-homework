@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820">
+  <rect width="1400" height="820" fill="#f7fafc"/>
+  <text x="70" y="65" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">LoRA：冻结大矩阵，只训练低秩增量</text>
+  <text x="70" y="106" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">y = W x + (alpha / r) B A x；两条分支相加得到输出</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="85" y="315" width="150" height="90" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="160" y="355" font-size="25" font-weight="700" fill="#194c4b">输入 x</text>
+    <text x="160" y="387" font-size="19" fill="#194c4b">d_in</text>
+    <rect x="365" y="190" width="250" height="130" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
+    <text x="490" y="235" font-size="26" font-weight="700" fill="#1f4d7a">冻结 W</text>
+    <text x="490" y="273" font-size="20" fill="#1f4d7a">全量权重</text>
+    <text x="490" y="301" font-size="18" fill="#1f4d7a">不更新梯度</text>
+    <rect x="365" y="475" width="250" height="130" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="490" y="520" font-size="26" font-weight="700" fill="#7a4c10">可训练 A、B</text>
+    <text x="490" y="558" font-size="20" fill="#7a4c10">低秩投影</text>
+    <text x="490" y="586" font-size="18" fill="#7a4c10">r 远小于维度</text>
+    <rect x="770" y="315" width="180" height="90" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/>
+    <text x="860" y="355" font-size="25" font-weight="700" fill="#64316c">相加</text>
+    <text x="860" y="387" font-size="19" fill="#64316c">W x + BA x</text>
+    <rect x="1090" y="315" width="210" height="90" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/>
+    <text x="1195" y="355" font-size="25" font-weight="700" fill="#35592f">输出 y</text>
+    <text x="1195" y="387" font-size="19" fill="#35592f">任务表示</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M235 360 C280 360 280 255 355 255 M235 360 C280 360 280 540 355 540"/>
+    <path d="M625 255 C700 255 700 360 760 360 M625 540 C700 540 700 360 760 360 M950 360 H1080"/>
+    <path d="M345 245 L365 255 L345 265 M345 530 L365 540 L345 550 M750 350 L770 360 L750 370 M750 530 L770 520 M1060 350 L1090 360 L1060 370"/>
+  </g>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="19" fill="#526579">
+    <text x="650" y="220">主分支</text>
+    <text x="650" y="605">低秩增量分支，乘以 alpha / r</text>
+  </g>
+  <rect x="230" y="700" width="940" height="58" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
+  <text x="700" y="737" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">实验检查：总参数量、可训练参数量、可训练比例，以及 target_modules 是否存在</text>
+</svg>

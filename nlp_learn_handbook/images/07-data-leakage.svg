@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="600" viewBox="0 0 1400 600">
+  <rect width="1400" height="600" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">数据划分与数据泄漏</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="80" y="210" width="250" height="130" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="205" y="260" font-size="24" font-weight="700" fill="#194c4b">训练集</text><text x="205" y="295" font-size="19" fill="#194c4b">学习参数</text>
+    <rect x="430" y="210" width="250" height="130" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="555" y="260" font-size="24" font-weight="700" fill="#1f4d7a">验证集</text><text x="555" y="295" font-size="19" fill="#1f4d7a">选模型和规则</text>
+    <rect x="780" y="210" width="250" height="130" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="905" y="260" font-size="24" font-weight="700" fill="#7a4c10">测试集</text><text x="905" y="295" font-size="19" fill="#7a4c10">最终一次评估</text>
+    <rect x="1130" y="210" width="210" height="130" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="1235" y="260" font-size="24" font-weight="700" fill="#64316c">报告</text><text x="1235" y="295" font-size="19" fill="#64316c">汇报测试结果</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M330 275 H420 M680 275 H770 M1030 275 H1120"/><path d="M390 265 L430 275 L390 285 M740 265 L780 275 L740 285 M1090 265 L1130 275 L1090 285"/></g>
+  <rect x="120" y="425" width="1160" height="82" rx="8" fill="#fff0f0" stroke="#c95c5c" stroke-width="3"/><text x="700" y="460" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="700" fill="#8a3030">泄漏警报</text><text x="700" y="490" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="19" fill="#8a3030">测试答案参与 prompt、调参、词表、去重或规则设计，会让测试结果失去独立性</text>
+</svg>

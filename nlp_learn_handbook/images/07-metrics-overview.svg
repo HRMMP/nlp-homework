@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="620" viewBox="0 0 1400 620">
+  <rect width="1400" height="620" fill="#f7fafc"/>
+  <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">三个实验的指标分别在比较什么</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="70" y="170" width="380" height="290" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="260" y="220" font-size="26" font-weight="700" fill="#64316c">NER：实体级 P / R / F1</text><text x="260" y="280" font-size="21" fill="#64316c">预测实体集合</text><text x="260" y="320" font-size="21" fill="#64316c">边界和类别都正确才是 TP</text><text x="260" y="370" font-size="21" fill="#64316c">多报 -> FP，漏报 -> FN</text><text x="260" y="420" font-size="20" fill="#64316c">不能用 token accuracy 替代</text>
+    <rect x="510" y="170" width="380" height="290" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="700" y="220" font-size="26" font-weight="700" fill="#1f4d7a">翻译：BLEU</text><text x="700" y="280" font-size="21" fill="#1f4d7a">候选译文与参考译文</text><text x="700" y="320" font-size="21" fill="#1f4d7a">比较 n-gram 重叠</text><text x="700" y="370" font-size="21" fill="#1f4d7a">考虑 brevity penalty</text><text x="700" y="420" font-size="20" fill="#1f4d7a">必须说明分词和实现配置</text>
+    <rect x="950" y="170" width="380" height="290" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/><text x="1140" y="220" font-size="26" font-weight="700" fill="#35592f">数学：Accuracy</text><text x="1140" y="280" font-size="21" fill="#35592f">抽取模型最终答案</text><text x="1140" y="320" font-size="21" fill="#35592f">归一化后与参考答案比较</text><text x="1140" y="370" font-size="21" fill="#35592f">判对数 / 测试题总数</text><text x="1140" y="420" font-size="20" fill="#35592f">保存解析失败原因</text>
+  </g>
+  <rect x="230" y="510" width="940" height="56" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/><text x="700" y="546" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#374b60">指标不是装饰性数字：输入、匹配规则和评估实现共同决定指标含义</text>
+</svg>

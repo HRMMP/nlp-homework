@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#f7fafc"/>
+  <text x="70" y="65" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">三项课程实验的共同结构</text>
+  <text x="70" y="105" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">输入与模型不同，但都需要清晰的数据处理、训练目标、推理过程和独立评估</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="80" y="170" width="1240" height="190" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
+    <text x="180" y="215" font-size="25" font-weight="700" fill="#1f4d7a">Transformer 翻译</text>
+    <text x="180" y="265" font-size="20" fill="#1f4d7a">source -> Encoder -> Decoder</text>
+    <text x="180" y="301" font-size="20" fill="#1f4d7a">-> prediction -> BLEU</text>
+    <rect x="425" y="215" width="220" height="100" rx="8" fill="#ffffff" stroke="#4d82bd" stroke-width="2"/>
+    <text x="535" y="258" font-size="20" fill="#1f4d7a">检查 mask</text>
+    <text x="535" y="292" font-size="18" fill="#1f4d7a">保存译文样例</text>
+    <rect x="710" y="215" width="220" height="100" rx="8" fill="#ffffff" stroke="#4d82bd" stroke-width="2"/>
+    <text x="820" y="258" font-size="20" fill="#1f4d7a">标签错位</text>
+    <text x="820" y="292" font-size="18" fill="#1f4d7a">独立 BLEU</text>
+    <rect x="995" y="215" width="220" height="100" rx="8" fill="#ffffff" stroke="#4d82bd" stroke-width="2"/>
+    <text x="1105" y="258" font-size="20" fill="#1f4d7a">训练 / 推理差异</text>
+    <text x="1105" y="292" font-size="18" fill="#1f4d7a">错误类型分析</text>
+    <rect x="80" y="395" width="1240" height="190" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
+    <text x="180" y="440" font-size="25" font-weight="700" fill="#194c4b">BERT NER</text>
+    <text x="180" y="490" font-size="20" fill="#194c4b">tokens -> BERT -> 标签</text>
+    <text x="180" y="526" font-size="20" fill="#194c4b">-> 实体集合 -> P/R/F1</text>
+    <rect x="425" y="440" width="220" height="100" rx="8" fill="#ffffff" stroke="#3a9d96" stroke-width="2"/>
+    <text x="535" y="483" font-size="20" fill="#194c4b">subword 对齐</text>
+    <text x="535" y="517" font-size="18" fill="#194c4b">特殊位置忽略</text>
+    <rect x="710" y="440" width="220" height="100" rx="8" fill="#ffffff" stroke="#3a9d96" stroke-width="2"/>
+    <text x="820" y="483" font-size="20" fill="#194c4b">BIO 解析</text>
+    <text x="820" y="517" font-size="18" fill="#194c4b">边界和类别</text>
+    <rect x="995" y="440" width="220" height="100" rx="8" fill="#ffffff" stroke="#3a9d96" stroke-width="2"/>
+    <text x="1105" y="483" font-size="20" fill="#194c4b">gold / pred</text>
+    <text x="1105" y="517" font-size="18" fill="#194c4b">错误样例</text>
+    <rect x="80" y="620" width="1240" height="190" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/>
+    <text x="180" y="665" font-size="25" font-weight="700" fill="#7a4c10">LoRA 数学微调</text>
+    <text x="180" y="715" font-size="20" fill="#7a4c10">question -> prompt -> generation</text>
+    <text x="180" y="751" font-size="20" fill="#7a4c10">-> extraction -> Accuracy</text>
+    <rect x="425" y="665" width="220" height="100" rx="8" fill="#ffffff" stroke="#d18c2f" stroke-width="2"/>
+    <text x="535" y="708" font-size="20" fill="#7a4c10">冻结基础模型</text>
+    <text x="535" y="742" font-size="18" fill="#7a4c10">统计可训练参数</text>
+    <rect x="710" y="665" width="220" height="100" rx="8" fill="#ffffff" stroke="#d18c2f" stroke-width="2"/>
+    <text x="820" y="708" font-size="20" fill="#7a4c10">答案抽取</text>
+    <text x="820" y="742" font-size="18" fill="#7a4c10">保留原始生成</text>
+    <rect x="995" y="665" width="220" height="100" rx="8" fill="#ffffff" stroke="#d18c2f" stroke-width="2"/>
+    <text x="1105" y="708" font-size="20" fill="#7a4c10">独立测试集</text>
+    <text x="1105" y="742" font-size="18" fill="#7a4c10">对比未微调基线</text>
+  </g>
+</svg>

@@ -19,6 +19,10 @@ Transformer 使用 Attention 建立序列中不同位置之间的联系，不依
   -> 目标词表 logits
 ```
 
+![Encoder-Decoder Transformer 的数据流](./images/05-transformer-architecture.svg)
+
+图 1：Encoder 提供源序列上下文，Decoder 通过 self-attention 和 cross-attention 生成目标 logits。
+
 ## 2. Scaled Dot-Product Attention
 
 给定 Query、Key、Value：
@@ -34,6 +38,10 @@ Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k) + mask) V
 3. softmax 变成权重，对 Value 加权求和。
 
 `Q` 表示“我现在要找什么”，`K` 表示“每个位置能被怎样匹配”，`V` 表示“匹配后要读取的内容”。这是帮助理解的直觉，不是每个维度的固定语义。
+
+![Q、K、V 到注意力输出的计算链](./images/05-qkv-attention.svg)
+
+图 2：注意力先计算匹配分数，再经过缩放、mask 和 softmax，最后加权读取 Value。
 
 ## 3. Self-Attention 和 Cross-Attention
 
@@ -60,6 +68,26 @@ X:       (B, L, H)
 ```
 
 实现时最容易错的是维度顺序、mask 的广播和合并 heads 的位置。
+
+### 4.1 Attention 的张量形状
+
+为了完成后面的形状练习，先固定使用 batch-first 的记号。自注意力分头后：
+
+```text
+Q, K, V:              (B, heads, L, head_dim)
+Q K^T 的注意力分数:   (B, heads, L, L)
+加权求和后的输出:     (B, heads, L, head_dim)
+```
+
+如果 Query 和 Key/Value 来自长度不同的序列，交叉注意力的形状是：
+
+```text
+Q:                    (B, heads, target_length, head_dim)
+K, V:                 (B, heads, source_length, head_dim)
+注意力分数:           (B, heads, target_length, source_length)
+```
+
+因此，mask 至少要能广播到对应的注意力分数形状。自注意力的 causal mask 常写成 `(target_length, target_length)`，再广播到 batch 和 head 维度；也可以显式写成 `(B, 1, target_length, target_length)`。具体写法以所用实现为准。
 
 ## 5. Position Representation
 
@@ -88,6 +116,10 @@ FFN(x) = activation(x W_1 + b_1) W_2 + b_2
 
 Attention 负责混合不同位置的信息；FFN 提供逐位置的非线性变换；残差连接帮助信息和梯度传播；LayerNorm 有助于训练稳定。具体的 pre-norm 或 post-norm 形式需要以实现为准。
 
+![Transformer Encoder 层的子层和残差路径](./images/05-encoder-layer.svg)
+
+图 3：Encoder 层由 self-attention、残差与 LayerNorm、FFN 等部分组成。
+
 ## 7. Decoder 层和两个重要 mask
 
 Decoder 的目标 self-attention 需要 causal mask：位置 `t` 不能读取 `t+1` 及之后的真实目标词，否则训练时会偷看答案。
@@ -98,6 +130,10 @@ Decoder 的目标 self-attention 需要 causal mask：位置 `t` 不能读取 `t
 - causal mask：不读取未来位置。
 
 二者作用不同。机器翻译实现中，源 padding、目标 padding 和目标 causal mask 可能在不同 attention 调用中分别使用。
+
+![BERT 与 GPT 风格注意力 mask 的可见区域](./images/05-masks.svg)
+
+图 2：padding mask 排除补齐位置，causal mask 排除未来位置；它们不是同一个 mask。
 
 ## 8. 训练、损失和生成
 
@@ -143,3 +179,9 @@ Decoder 输入和标签错开：
 - Vaswani et al., [Attention Is All You Need](https://arxiv.org/abs/1706.03762)。
 - Harvard NLP, [The Annotated Transformer](https://nlp.seas.harvard.edu/annotated-transformer/)。
 - PyTorch [MultiheadAttention 文档](https://pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html)。
+
+## 本章总结框图
+
+![第 05 节 Transformer 总结](./images/summary-05-transformer.svg)
+
+图：本章总结 Transformer 从位置表示、Encoder、Decoder 到 logits 的计算路径及关键检查点。

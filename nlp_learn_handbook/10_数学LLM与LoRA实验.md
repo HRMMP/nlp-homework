@@ -10,6 +10,10 @@
         -> 答案抽取 -> 归一化 -> 判分
 ```
 
+![数学 LLM 与 LoRA 实验的评估流程](./images/10-math-lora-evaluation.svg)
+
+图 1：生成文本、答案抽取、格式归一化和最终判分应分别保存和测试。
+
 开始前确认：
 
 - 基础模型名称、版本和许可证。
@@ -127,3 +131,9 @@ trainable_ratio
 ## 10. 实验完成标准
 
 需要有基础模型和数据说明、独立数据划分、prompt 与 labels 检查、LoRA 可训练参数统计、smoke test、训练日志、原始生成结果、答案抽取规则和独立 Accuracy 评估。完整训练未运行时，应明确写出原因和已完成的检查。
+
+## 本章总结框图
+
+![第 10 节数学 LLM 与 LoRA 实验总结](./images/summary-10-math-lora.svg)
+
+图：本章把数学题、Prompt、LoRA 生成、答案抽取和 Accuracy 串成可检查的链路。

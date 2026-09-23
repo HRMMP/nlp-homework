@@ -43,6 +43,10 @@ r * d_in + d_out * r
 
 当 `r` 比两个原始维度小很多时，可训练参数明显减少。
 
+![LoRA 的冻结主分支和低秩增量分支](./images/07-lora-adapter.svg)
+
+图 1：LoRA 保留冻结的基础权重 `W`，只训练低秩矩阵 `A`、`B` 形成的增量。
+
 ## 3. 为什么必须检查可训练参数
 
 “使用了 PEFT 库”不等于实验一定是 LoRA。配置后应该统计：
@@ -134,6 +138,10 @@ Accuracy = 判对题数 / 测试题总数
 
 必须先明确什么叫“判对”。答案抽取、数字归一化、分数和单位处理都会影响结果。
 
+![NER、翻译和数学任务的指标含义](./images/07-metrics-overview.svg)
+
+图 2：实体级 P/R/F1、BLEU 和 Accuracy 的比较对象及判定规则不同。
+
 ## 8. 数据泄漏
 
 常见泄漏包括：
@@ -144,6 +152,10 @@ Accuracy = 判对题数 / 测试题总数
 - 训练和测试包含重复题目或同源改写，却未检查。
 
 发现测试集规则需要修改时，应记录这一事实，并重新划分或重新定义评估，不能悄悄替换规则后只保留较高分数。
+
+![数据划分和泄漏风险](./images/07-data-leakage.svg)
+
+图 3：测试集只能在方案确定后评估，不能反过来影响规则和参数。
 
 ## 9. 本章自测
 
@@ -163,3 +175,9 @@ Accuracy = 判对题数 / 测试题总数
 - [Hugging Face PEFT 文档](https://huggingface.co/docs/peft/index)。
 - [Hugging Face Token Classification 指南](https://huggingface.co/docs/transformers/tasks/token_classification)。
 - [SacreBLEU](https://github.com/mjpost/sacrebleu)。
+
+## 本章总结框图
+
+![第 07 节微调与 LoRA 总结](./images/summary-07-finetune-lora.svg)
+
+图：本章把数据、基础模型、LoRA、生成和独立指标连成评估闭环。

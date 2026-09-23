@@ -8,6 +8,10 @@
 原始文本 -> 清洗/规范化 -> token 化 -> token id -> 向量
 ```
 
+![从文本到 token id 和 embedding 向量](./images/02-text-to-vector.svg)
+
+图 1：token id 是词表索引，embedding 查表后才得到供模型计算的向量；不同任务的输出结构也不同。
+
 例如，假设词表为：
 
 ```text
@@ -56,6 +60,10 @@ ids:    [2, 3, 4]
 ```
 
 `<pad>` 不是真实内容。注意力 mask 应阻止模型读取 padding，loss 也通常不计算 padding 位置。一个常见错误是只在输入中 mask，却仍把目标 padding 纳入损失。
+
+![padding 对 attention mask 和 loss 的影响](./images/02-padding-mask-loss.svg)
+
+图 2：padding 既不应被注意力读取，也不应被当成有效目标计算 loss。
 
 ## 4. One-hot 和 embedding
 
@@ -153,3 +161,9 @@ P(x_1, ..., x_T) = product_t P(x_t | x_1, ..., x_{t-1})
 ## 9. 建议的小作业
 
 取一句你熟悉的中文句子，分别设计“按字切分”和“按词切分”两种结果。比较它们的序列长度、可能的实体标签数量和未知词风险。不要判断哪种一定更好，写出需要用实验验证的因素。
+
+## 本章总结框图
+
+![第 02 节文本表示总结](./images/summary-02-text-representation.svg)
+
+图：本章总结文本从 token 化、id、embedding 到不同任务输出的转换过程。

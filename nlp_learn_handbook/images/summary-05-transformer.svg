@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540">
+  <rect width="1400" height="540" fill="#f7fafc"/>
+  <text x="70" y="66" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">第 05 节总结：Transformer 的一条完整路径</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="70" y="205" width="220" height="125" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="180" y="253" font-size="24" font-weight="700" fill="#194c4b">Embedding</text><text x="180" y="288" font-size="19" fill="#194c4b">+ 位置表示</text>
+    <rect x="340" y="205" width="220" height="125" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="450" y="253" font-size="24" font-weight="700" fill="#1f4d7a">Encoder</text><text x="450" y="288" font-size="19" fill="#1f4d7a">self-attention</text>
+    <rect x="610" y="205" width="220" height="125" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="720" y="253" font-size="24" font-weight="700" fill="#7a4c10">Decoder</text><text x="720" y="288" font-size="19" fill="#7a4c10">causal self-attention</text>
+    <rect x="880" y="205" width="220" height="125" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="990" y="253" font-size="24" font-weight="700" fill="#64316c">Cross-attention</text><text x="990" y="288" font-size="19" fill="#64316c">读取源表示</text>
+    <rect x="1150" y="205" width="190" height="125" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/><text x="1245" y="253" font-size="24" font-weight="700" fill="#35592f">logits</text><text x="1245" y="288" font-size="19" fill="#35592f">生成目标 token</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M290 268 H330 M560 268 H600 M830 268 H870 M1100 268 H1140"/><path d="M320 258 L340 268 L320 278 M590 258 L610 268 L590 278 M860 258 L880 268 L860 278 M1130 258 L1150 268 L1130 278"/></g>
+  <rect x="260" y="405" width="880" height="60" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/><text x="700" y="443" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">必须同时检查：Q/K/V 形状、padding mask、causal mask、标签错位和生成停止条件</text>
+</svg>

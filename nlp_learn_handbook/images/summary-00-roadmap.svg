@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="540" viewBox="0 0 1400 540">
+  <rect width="1400" height="540" fill="#f7fafc"/>
+  <text x="70" y="66" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">第 00 节总结：先建立学习路线</text>
+  <text x="70" y="108" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">先修知识支撑模型理解，模型理解再支撑三个正式实验</text>
+  <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <rect x="70" y="220" width="220" height="120" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/><text x="180" y="270" font-size="24" font-weight="700" fill="#194c4b">Python 与数学</text><text x="180" y="305" font-size="19" fill="#194c4b">读懂代码和形状</text>
+    <rect x="340" y="220" width="220" height="120" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/><text x="450" y="270" font-size="24" font-weight="700" fill="#1f4d7a">NLP 基础</text><text x="450" y="305" font-size="19" fill="#1f4d7a">文本与 token</text>
+    <rect x="610" y="220" width="220" height="120" rx="8" fill="#fff1d6" stroke="#d18c2f" stroke-width="3"/><text x="720" y="270" font-size="24" font-weight="700" fill="#7a4c10">神经网络</text><text x="720" y="305" font-size="19" fill="#7a4c10">序列与表示</text>
+    <rect x="880" y="220" width="220" height="120" rx="8" fill="#f4e5f5" stroke="#9a5ba4" stroke-width="3"/><text x="990" y="270" font-size="24" font-weight="700" fill="#64316c">Transformer</text><text x="990" y="305" font-size="19" fill="#64316c">预训练与微调</text>
+    <rect x="1150" y="220" width="190" height="120" rx="8" fill="#e9f0e6" stroke="#638a5e" stroke-width="3"/><text x="1245" y="270" font-size="24" font-weight="700" fill="#35592f">三项实验</text><text x="1245" y="305" font-size="19" fill="#35592f">翻译 / NER / LoRA</text>
+  </g>
+  <g fill="none" stroke="#637588" stroke-width="4" stroke-linecap="round"><path d="M290 280 H330 M560 280 H600 M830 280 H870 M1100 280 H1140"/><path d="M320 270 L340 280 L320 290 M590 270 L610 280 L590 290 M860 270 L880 280 L860 290 M1130 270 L1150 280 L1130 290"/></g>
+  <rect x="300" y="405" width="800" height="60" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/><text x="700" y="443" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="21" fill="#374b60">本节目标：知道先学什么、为什么按这个顺序学，以及暂时不急着做什么</text>
+</svg>
