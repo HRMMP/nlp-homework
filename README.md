@@ -10,8 +10,8 @@
 
 | Lab | 目录 | 实验内容 | 当前进度 |
 | --- | --- | --- | --- |
-| Lab 1 | [`machine_translation/`](./machine_translation/) | 使用 Transformer 实现机器翻译，并使用 BLEU 评价翻译结果。 | 已创建目录、要求文档和入门学习资料；尚未开始数据准备、代码实现和实验运行。 |
-| Lab 2 | [`bert_ner/`](./bert_ner/) | 使用 BERT 完成命名实体识别，并报告 Precision、Recall 和 F1 Score。 | 已创建目录、要求文档和入门学习资料；尚未开始数据准备、代码实现和实验运行。 |
+| Lab 1 | [`machine_translation/`](./machine_translation/) | 使用 Transformer 实现机器翻译，并使用 BLEU 评价翻译结果。 | 已实现 OPUS Books 英译法数据处理、Transformer 训练/解码/独立 BLEU 评估入口、配置与基础测试；仓库默认环境未安装依赖，已在临时环境通过测试和小规模 smoke，正式训练/测试集评估尚未运行。 |
+| Lab 2 | [`bert_ner/`](./bert_ner/) | 使用 BERT 完成命名实体识别，并报告 Precision、Recall 和 F1 Score。 | 已准备 CLUENER 2020 数据，加入数据审计、BIO/subword 对齐、实体级评估、训练入口和单元测试；尚未安装训练依赖或运行训练。 |
 | Lab 3 | [`lora_math_finetuning/`](./lora_math_finetuning/) | 在数学数据集上使用 LoRA 进行大模型参数高效微调，并在测试集上统计准确率。 | 已创建目录、要求文档和入门学习资料；尚未开始数据准备、代码实现和实验运行。 |
 
 ## 当前项目状态
@@ -26,13 +26,13 @@
 
 ### 尚未完成
 
-- 选择并准备各实验数据集。
-- 确定模型、分词器和实验配置。
-- 编写训练、评估和推理代码。
-- 完成数据预处理和关键逻辑测试。
-- 完成小规模 smoke test。
+- 确认并准备机器翻译实验数据；运行小规模 smoke test 和正式训练，保存日志、检查点、测试集预测及 BLEU 结果。
+- 确认并准备 NER 实验的 CLUENER 2020 数据集；LoRA 实验仍需选择和准备数据集。
+- 完成各实验的小规模 smoke test。
 - 运行正式实验并保存日志、检查点和结构化结果。
 - 撰写实验结果分析和最终实验报告。
+
+实验报告初稿及 XeLaTeX 编译说明见 [`reports/README.md`](./reports/README.md)。
 
 ## 共同报告要求
 

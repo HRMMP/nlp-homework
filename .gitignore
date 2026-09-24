@@ -22,6 +22,7 @@ outputs/
 checkpoints/
 runs/
 logs/
+reports/build/
 
 # Model weights and generated artifacts
 *.pt

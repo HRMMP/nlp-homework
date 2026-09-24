@@ -43,13 +43,7 @@ for word in words:
 
 ## 2. 文件和命令行
 
-实验通常通过命令行运行。需要理解：
-
-```bash
-python -m package.train --config configs/smoke.yaml
-```
-
-`python` 启动解释器，`-m package.train` 运行一个模块，后面的内容是命令行参数。参数通常由配置对象读取，便于保存实验设置。
+以下是命令行语法示意，不是当前仓库可直接运行的命令：`package.train` 和 `configs/smoke.yaml` 是占位名称。实验实现后必须替换为对应 README 中真实存在的入口和配置；运行前确认 Python 环境与依赖。
 
 读取文本时要明确编码和数据格式：
 

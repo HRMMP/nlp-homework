@@ -1,0 +1,431 @@
+\documentclass[UTF8,a4paper,12pt,fontset=none]{ctexart}
+
+\setCJKmainfont{Noto Serif CJK SC}
+\setCJKsansfont{Noto Sans CJK SC}
+\setCJKmonofont{Noto Sans Mono CJK SC}
+\usepackage[margin=2.45cm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{array,booktabs,longtable,tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!45!black,
+  urlcolor=blue!55!black,
+  citecolor=blue!45!black,
+  pdftitle={自然语言处理大作业实验报告},
+  pdfauthor={待填写}
+}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\setlist{itemsep=0.25em,topsep=0.35em}
+\renewcommand{\arraystretch}{1.35}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\todo}[1]{\textcolor{red!70!black}{\textbf{[待填写：#1]}}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{自然语言处理大作业}
+\fancyhead[R]{实验报告}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+  \centering
+  \vspace*{2.2cm}
+  {\zihao{2}\bfseries 自然语言处理大作业\par}
+  \vspace{0.8cm}
+  {\zihao{1}\bfseries 实验报告\par}
+  \vspace{1.8cm}
+  {\zihao{3}机器翻译、命名实体识别与大模型参数高效微调\par}
+  \vfill
+  \renewcommand{\arraystretch}{1.8}
+  \begin{tabular}{>{\raggedleft\arraybackslash}p{3.2cm}p{7.2cm}}
+    组别： & \todo{第 x 组} \\
+    组长姓名： & \todo{组长姓名} \\
+    组长学号： & \todo{组长学号} \\
+    组员： & \todo{另外两位组员姓名及学号} \\
+    完成日期： & \todo{年/月/日} \\
+  \end{tabular}
+  \vfill
+\end{titlepage}
+
+\hypersetup{pageanchor=true}
+\pagenumbering{Roman}
+\begin{abstract}
+本文围绕自然语言处理课程要求的三个任务展开：基于 Transformer 的机器翻译、基于 BERT 的命名实体识别，以及在数学题任务中使用 LoRA 进行大语言模型参数高效微调。本文介绍三类任务的输入输出形式、研究脉络和评价关注点，并区分序列生成、序列标注与参数高效适配的不同问题结构。具体数据集、模型配置、实验结果和误差分析须依据本组实际方案及运行记录补充；本文当前稿不预设实验结论。
+
+\noindent\textbf{关键词：} 机器翻译；命名实体识别；Transformer；BERT；LoRA
+\end{abstract}
+
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+\section{背景和问题介绍}
+
+\subsection{研究背景}
+自然语言处理（Natural Language Processing, NLP）研究如何使计算机处理、分析和生成自然语言。与数值或图像等结构相对固定的数据不同，自然语言会受到词义、语境、语序、表达习惯和领域知识等因素影响。同一词语在不同上下文中可能有不同含义；同一含义也可能通过不同词语表达。因此，NLP 系统通常需要把文本转换为 token 序列，再学习输入文本与任务输出之间的对应关系。数据整理、文本切分、模型建模、输出解码和评价共同构成任务流程，任一环节处理不当都可能影响最后结果。
+
+本课程大作业包含机器翻译、命名实体识别和数学数据集上的大语言模型参数高效微调。三项任务分别代表了自然语言处理中三种不同的输出形式：机器翻译从源文本生成目标文本；命名实体识别从文本中抽取带边界和类别的结构化信息；数学题微调则要求生成式模型根据问题生成回答，并通过答案抽取和判分得到任务指标。序列到序列学习、Transformer、预训练语言模型及参数高效微调为这些任务提供了重要的方法基础\cite{seq2seq,transformer,bert,lora}。
+
+三项任务虽然可以使用共享的神经网络组件，但它们不能被视为同一个分类问题。翻译结果是一段目标语言序列，评价需要比较生成译文与参考译文；NER 输出的是一组实体跨度及其类别，评价关注边界和类别是否同时正确；数学题生成首先产生自由文本，还需定义从文本中抽取最终答案并进行判分的规则。因而，研究背景部分要先界定各任务的问题形式，后续方法和指标也必须与相应输出保持一致。下文介绍任务的一般定义和代表性方法，不据此推断本组已经完成某种具体实验。
+
+\subsection{机器翻译问题}
+机器翻译的目标是根据源语言句子生成语义相符的目标语言句子。设源序列为 $\mathbf{x}=(x_1,\ldots,x_m)$，目标序列为 $\mathbf{y}=(y_1,\ldots,y_n)$，其中源、目标序列长度 $m$ 和 $n$ 可以不同。生成模型通常将任务表示为条件序列建模：
+\[
+  P(\mathbf{y}\mid\mathbf{x})=\prod_{t=1}^{n}P(y_t\mid y_{<t},\mathbf{x}).
+\]
+也就是说，模型在生成第 $t$ 个目标 token 时，既要利用源句信息，也要利用此前已经生成的目标前缀。这个定义表达了机器翻译的基本输入输出关系，并不预设具体的解码算法或模型配置。
+
+机器翻译的难点不仅是把源语言词语逐个替换成目标语言词语。不同语言在词汇、语序、形态和表达习惯上可能存在差异；源词还可能因上下文而具有不同含义。模型需要在保留原文关键信息的同时生成符合目标语言习惯的句子，处理专有名词、长距离依赖、漏译、重复和过早结束等问题。数据方面，平行句对的质量、训练与测试分布差异以及分词方式都会影响模型能够学习和评价的范围。因此，实验报告应明确源语言、目标语言、语料来源、数据划分、tokenizer 与预处理，而不能只写模型名称。
+
+课程要求使用 Transformer 实现机器翻译。评价方面，BLEU 通过比较候选译文与参考译文的 n-gram 重叠并加入长度惩罚形成自动评价分数\cite{bleu}。该分数适合对一组输出作可重复的汇总，但不能单独说明模型在哪些句子上正确或发生了何种错误。报告还应保留真实源句、参考译文和模型译文，说明 BLEU 的实现和计算配置，并结合案例分析译文质量。具体语言方向、数据集、分词和模型超参数须按本组实际方案填写。
+
+\subsection{命名实体识别问题}
+命名实体识别（Named Entity Recognition, NER）旨在从文本中定位特定实体片段并判定其类别。常见实体包括人名、地点名和组织机构名，但实际类别集合由任务和数据集定义。若把句子表示为 token 序列 $w_1,\ldots,w_n$，NER 可以被建模为序列标注：模型对序列中各位置预测标签，再根据标签序列恢复实体的起止边界和类别。任务输出因此不只是“句子里出现了哪一类实体”，还包括实体具体出现的位置。
+
+BIO 和 BIOES 是常见的序列标注编码方式。以 BIO 为例，`B-X` 表示类别为 X 的实体开始，`I-X` 表示同一实体内部的后续位置，`O` 表示不属于实体；BIOES 进一步区分实体末尾和单 token 实体。不同数据集可能采用不同标签集合，也可能采用不同的分词粒度，因此标注方案必须和数据格式一起说明。实体边界错一个 token，或边界正确但类别预测错误，都会影响实体级评价。
+
+课程要求使用 BERT 完成 NER。常见实现是在预训练上下文表示上增加逐 token 分类层，并使用带标签的数据进行微调\cite{bert}。一个实际问题是 tokenizer 可能把原始标注单位（例如一个词）切分成多个 subword；实现需要规定标签如何映射到这些子词，哪些位置参与损失计算，以及如何把预测结果还原到原始文本。特殊 token、padding 和截断位置也不应误作为真实实体位置。
+
+NER 的评价应以实体为单位：预测实体通常只有在跨度和类别都与真实标注匹配时才计为正确。Precision 反映预测实体中正确实体的比例，Recall 反映真实实体中被找出的比例，F1 综合这两项指标。由于非实体位置（O 标签）可能占多数，token accuracy 单独使用时无法充分反映实体边界和类别识别质量。报告需要说明使用的标签方案、实体匹配规则、评估工具和汇总口径；具体数据集、类别及 subword 对齐策略应根据本组实际实验确定。
+
+\subsection{数学题微调问题}
+本任务关注如何使生成式预训练模型针对数学题目生成回答，并评价抽取出的最终答案是否符合参考答案。设题目为 $q$，经过提示模板组织后的模型输入为 $p(q)$，模型生成文本为 $r$，答案抽取和规范化过程为 $g$，则参与判分的答案可以表示为 $a=g(r)$。从生成文本到准确率之间至少包含“题目输入、文本生成、答案抽取、答案比较”几个步骤；如果只保存最终准确率，就难以区分模型推理错误、输出格式不符合要求和解析器抽取失败。
+
+答案判定规则是该任务定义的一部分，而非无关紧要的后处理。例如，数字格式、分数表示、负号、单位或等价表达式的处理，都可能改变某个样本是否被判为正确。实验需要预先说明这些规则，保留原始生成文本、抽取答案、参考答案和逐样本判定结果，并确保最终准确率在独立测试集上计算。模型生成了解题过程并不自动意味着过程正确；如果报告只评价最终答案，也不应把答案正确率扩大解释为推理过程质量。
+
+LoRA（Low-Rank Adaptation）是在预训练模型权重上增加低秩可训练更新的一种参数高效微调方法。对权重矩阵 $W$，常见形式为 $W'=W+\frac{\alpha}{r}BA$，其中基础权重通常冻结，$A$ 和 $B$ 是新增的低秩矩阵，$r$ 是低秩维度，$\alpha$ 是缩放系数\cite{lora}。这一设计限制需要训练的参数范围，但不能保证特定数学数据集上的准确率必然提高。本课程要求在数学数据集上使用 LoRA 微调并在测试集统计准确率；基础模型、数据集、提示模板、可训练参数范围、对照基线和答案判定规则均须由本组实际方案确定并记录。
+
+\subsection{实验目标与研究问题}
+围绕课程规定的任务，本报告将分别从模型表示、数据处理和评价方式讨论以下问题：
+\begin{enumerate}
+  \item 对于机器翻译，Transformer 如何结合源序列表示与已生成的目标前缀生成译文？BLEU 的汇总分数与逐句译文分析分别能提供哪些信息？
+  \item 对于命名实体识别，BERT 的上下文表示如何转化为 token 标签？分词粒度变化时如何对齐标签，为什么需要报告实体级 Precision、Recall 和 F1？
+  \item 对于数学题微调，LoRA 如何在限制可训练参数范围的同时适配生成模型？如何区分生成错误、答案抽取错误和判分规则造成的差异？
+  \item 对于三项实验，如何记录数据来源、数据划分、软件环境、配置和逐样本预测，使指标能够追溯并独立复核？
+\end{enumerate}
+这些问题用于界定报告的讨论范围，并不代表本组已经完成相应训练或取得特定结果。实验章节应在实际方案和运行记录形成后，补充数据、配置、结果、误差案例及其证据。
+
+\section{目前的研究现状}
+
+\subsection{机器翻译相关研究}
+神经机器翻译把翻译建模为从源序列到目标序列的条件生成问题。序列到序列模型由编码部分表示输入，再由生成部分逐步产生输出，为端到端神经翻译提供了典型建模形式\cite{seq2seq}。这一形式能够处理源句与目标句长度不同的情况，但模型仍须建立源端信息与目标端生成步骤之间的联系。
+
+Transformer 使用注意力机制构建 Encoder--Decoder 架构\cite{transformer}。Encoder 的自注意力用于整合源序列内部不同位置的信息；Decoder 的因果自注意力限制当前位置只能读取已生成的目标前缀，交叉注意力则让 Decoder 使用 Encoder 对源句形成的表示。位置表示为序列补充顺序信息，前馈网络、残差连接和归一化共同构成各层的基本计算单元。与逐步进行循环状态更新的架构相比，Transformer 的注意力计算可以在训练阶段并行处理多个序列位置；但自回归解码时，目标 token 仍需要按生成过程逐步产生。报告中应据本组实际代码或库说明哪些结构被实现或调用，不能仅凭“使用 Transformer”推定细节完全一致。
+
+自动评价方面，BLEU 根据候选译文与参考译文间不同阶 n-gram 的匹配情况计算分数，并通过长度惩罚降低过短候选译文带来的偏差\cite{bleu}。BLEU 提供了便于批量计算的共同尺度，但其数值受分词、大小写处理、参考译文数量、平滑和长度计算等配置影响；它衡量的是与参考文本的表面匹配，不能替代对含义、流畅度和具体错误的人工检查。因此，规范的机器翻译实验既应报告可复算的 BLEU 配置，也应保留逐样本预测，讨论漏译、错译、重复、专名和长句等真实现象，而不把单一分数解释为完整的翻译质量结论。
+
+\subsection{命名实体识别相关研究}
+NER 通常以序列标注方式处理：输入文本经过表示层后，各 token 的表示被映射到实体标签，再按约定的标签转移规则解码为实体跨度和类别。基于词典或人工特征的方法需要显式设计匹配规则；预训练语言模型路线则先从大规模文本中学习上下文表示，再使用下游标注数据进行任务微调。BERT 以双向 Transformer Encoder 建立上下文表示，并通过预训练后微调的范式用于多种语言理解任务，包括命名实体识别\cite{bert}。
+
+将 BERT 用于 token classification 时，分类层对每个有效位置的隐藏表示预测标签。此路线降低了为每个下游任务从头学习表示的需求，但不会自动解决标注质量、实体边界和数据分布问题。尤其在 tokenizer 输出 subword 而数据按词或字符标注时，首个子词、后续子词、特殊 token 和 padding 的训练与评估策略必须保持一致。否则标签长度可能与模型输入错位，或训练指标和最终实体指标对应不同对象。
+
+实体级评价把预测标签还原为实体集合，并按边界和类别匹配计算 Precision、Recall 与 F1。边界不完整、类别混淆、实体漏检和误报会以不同方式影响这些指标，因此分类别指标与真实错误样例有助于解释总体分数。BIO/BIOES 选择、是否忽略 O 标签、严格或宽松的跨度匹配、micro 或 macro 汇总均会影响结果含义，应在报告中明确。本课程要求 BERT NER 并报告实体级指标；具体模型标识、数据集、标签体系和对齐策略仍须以实际实验设置为准。
+
+\subsection{大语言模型与参数高效微调}
+生成式预训练模型通常通过自回归目标，根据已有 token 预测后续 token。指令微调进一步使用指令及相应回答的监督样本训练模型，使其学习按任务要求组织输出。InstructGPT 的研究在监督微调基础上结合人类偏好反馈来训练更符合指令意图的模型\cite{instructgpt}。这说明“生成文本”和“遵循特定任务要求”并非同一概念，也不意味着经过指令训练的模型对数学问题必然正确；实际回答仍需按预先定义的任务规则评价。
+
+全参数微调会更新基础模型中大量参数，并需要保存相应训练状态或权重。参数高效微调（Parameter-Efficient Fine-Tuning, PEFT）通过限制可训练参数的范围降低适配任务时的参数更新和存储负担。LoRA 冻结基础权重 $W$，以低秩矩阵表示可训练增量：
+\[
+  W'=W+\frac{\alpha}{r}BA.
+\]
+若 $W$ 的形状为 $d_{\mathrm{out}}\times d_{\mathrm{in}}$，全量更新涉及 $d_{\mathrm{out}}d_{\mathrm{in}}$ 个权重；低秩分支涉及约 $r(d_{\mathrm{in}}+d_{\mathrm{out}})$ 个参数。当 $r$ 相对较小时，可训练参数数量可以低于全量更新所需数量\cite{lora}。实际收益仍受模型结构、目标模块、秩、实现方式和硬件影响，实验必须统计可训练参数并记录配置，不能只根据方法名称声称节省了特定资源或取得了更好效果。
+
+QLoRA 进一步将量化后的基础模型与 LoRA 适配结合，研究在受限硬件条件下进行大模型微调的方案\cite{qlora}。它与 LoRA 的关系是对基础权重存储方式及微调流程的扩展，不应与本课程指定的 LoRA 任务混为一谈；若实验并未采用 QLoRA，也不应把相关量化设置写成本组实现。无论采用何种变体，都需报告基础模型、量化与适配器配置、实际可训练参数范围和运行条件。
+
+在数学题任务中，研究和工程评价还需要把生成、答案抽取与判分拆开。若基线模型和 LoRA 模型使用不同提示、解码参数或抽取规则，最终准确率的差异便不能简单归因于 LoRA。因而，对照实验应尽量保持测试样本与判分流程一致，保存原始生成文本和逐题判定记录，并明确数学表达式等价、格式规范化及抽取失败的处理规则。本课程要求测试集准确率，具体基础模型、数据划分和答案规则则由本组实际方案确定。
+
+\subsection{本实验方案定位}
+本课程大作业关注三种具有代表性的任务结构，而非要求提出新的模型结构：机器翻译关注条件序列生成，NER 关注实体边界和类型的结构化识别，数学题微调关注生成模型的任务适配及答案判定。相应地，三项任务的数据格式、预处理、模型输出和评价对象各不相同；BLEU、实体级 Precision/Recall/F1 和数学题 Accuracy 不能彼此替代。
+
+本报告的研究现状聚焦于与课程指定方法直接相关的代表工作，用于解释实验任务为何采用 Transformer、BERT 和 LoRA 作为讨论对象，不据此宣称这些方法是所有场景下的最优方案，也不声称本组实验具有研究创新性。后续章节应进一步把通用方法对应到本组真正选用的数据、模型、代码和配置，并用保存的运行记录支持结果分析。数据集与许可证、具体模型版本、标签和提示定义等没有实际依据的信息，应在确认后再写入实验方案。
+
+
+
+\section{模型与算法设计}
+
+\subsection{实验环境与复现设置}
+填写实际运行环境。未记录或无法核实的项目请保留“待确认”，不要根据常见配置推测。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.26\textwidth}Y}
+\toprule
+项目 & 实际配置 \\
+\midrule
+操作系统与版本 & \todo{填写} \\
+Python 版本 & \todo{填写} \\
+深度学习框架及版本 & \todo{填写} \\
+CUDA / 加速设备 & \todo{填写；如未使用则注明} \\
+CPU、GPU 与内存 & \todo{填写实际设备型号及可用资源} \\
+随机种子 & \todo{填写；说明随机种子的设置范围} \\
+依赖清单或环境文件 & \todo{填写仓库路径及版本记录方式} \\
+\bottomrule
+\end{tabularx}
+
+\subsection{机器翻译实验设计}
+
+\subsubsection{数据集与预处理}
+\begin{itemize}
+  \item 数据集名称、版本及来源：\todo{填写可核验的信息和链接或文献}
+  \item 许可协议：\todo{填写许可证；未确认时注明待确认}
+  \item 源语言与目标语言：\todo{填写}
+  \item 训练集、验证集、测试集划分：\todo{填写样本数量、划分依据及是否使用官方划分}
+  \item 清洗、过滤和文本规范化：\todo{按实际步骤填写}
+  \item 分词器、词表构建方式及词表大小：\todo{填写}
+  \item 特殊 token 及其用途：\todo{填写，如 BOS、EOS、PAD、UNK 等实际使用项}
+\end{itemize}
+
+\subsubsection{Transformer 模型}
+说明模型结构的实现方式或所用库，并结合实际配置介绍 Encoder、Decoder、自注意力与交叉注意力、FFN、位置编码、残差连接和归一化。若使用现成模型或库，应指出具体名称、版本及自行实现的部分。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.31\textwidth}Y}
+\toprule
+配置项 & 实际设置 \\
+\midrule
+Encoder / Decoder 层数 & \todo{填写} \\
+模型维度、注意力头数、FFN 维度 & \todo{填写} \\
+位置编码方式 & \todo{填写} \\
+Dropout 与参数量 & \todo{填写} \\
+训练目标与损失函数 & \todo{填写，包括 teacher forcing 等实际策略} \\
+优化器、学习率与调度策略 & \todo{填写} \\
+Batch size、训练轮数、序列长度 & \todo{填写} \\
+解码方法及推理参数 & \todo{填写，如 beam size 或最大生成长度} \\
+\bottomrule
+\end{tabularx}
+
+\subsubsection{训练与 BLEU 评价}
+说明训练流程、模型选择依据和检查点保存方式。报告 BLEU 时，写明所用实现及版本、tokenization、大小写处理、\textit{n}-gram 配置、参考译文数量和长度惩罚等配置；测试集只用于最终评价。
+
+\subsection{命名实体识别实验设计}
+
+\subsubsection{数据集与标签方案}
+\begin{itemize}
+  \item 数据集名称、来源、许可协议及文本语言：\todo{填写}
+  \item 训练集、验证集、测试集规模与划分方式：\todo{填写}
+  \item 实体类别及标签集合：\todo{填写}
+  \item 标注方案：\todo{明确 BIO 或 BIOES，并给出标签含义}
+  \item 文本预处理及最大序列长度：\todo{填写}
+\end{itemize}
+
+\subsubsection{BERT 模型与标签对齐}
+填写预训练模型名称、来源和版本，说明 token classification 输出层、训练目标和微调策略。明确 tokenizer 将词切分为 subword 后如何对齐标签，如何处理特殊 token、padding、被截断 token，以及损失计算中哪些位置会被忽略。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.31\textwidth}Y}
+\toprule
+配置项 & 实际设置 \\
+\midrule
+预训练模型与 tokenizer & \todo{填写名称、版本或模型标识} \\
+最大序列长度与截断策略 & \todo{填写} \\
+Subword 标签对齐策略 & \todo{填写；说明首个 subword、其余 subword 的处理} \\
+损失函数与忽略标签 & \todo{填写，包括 padding / special token 的处理} \\
+优化器、学习率、Batch size、轮数 & \todo{填写} \\
+随机种子、最佳模型选择规则 & \todo{填写} \\
+\bottomrule
+\end{tabularx}
+
+\subsubsection{实体级评价指标}
+报告实体级 Precision、Recall 和 F1。说明评估库及版本、实体边界和类别是否必须同时匹配、是否忽略 \texttt{O} 标签，以及采用 micro、macro 或其他汇总方式。Token accuracy 可作为补充，不可替代实体级指标。
+
+\subsection{数学数据集上的 LoRA 微调设计}
+
+\subsubsection{基础模型、数据与提示格式}
+\begin{itemize}
+  \item 基础模型名称、版本、来源与许可：\todo{填写}
+  \item 数学数据集名称、来源、许可与样本规模：\todo{填写}
+  \item 训练、验证、测试划分及防止数据泄漏的措施：\todo{填写}
+  \item 输入提示模板：\todo{给出实际模板，明确题目、指令和答案格式}
+  \item 训练目标及目标文本构造：\todo{填写}
+\end{itemize}
+
+\subsubsection{LoRA 与训练设置}
+说明 LoRA 的插入位置和冻结策略，给出可训练参数范围，并报告可训练参数数量及其占总参数的比例。说明生成配置与训练配置；不要只写 LoRA 参数而省略基础模型和目标模块。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}Y}
+\toprule
+配置项 & 实际设置 \\
+\midrule
+LoRA rank $r$、alpha、dropout & \todo{填写} \\
+目标模块 & \todo{填写具体模块名} \\
+冻结参数与可训练参数范围 & \todo{填写；说明检查方式} \\
+可训练参数数量 / 总参数数量 & \todo{填写实际统计值} \\
+优化器、学习率、Batch size、轮数 & \todo{填写} \\
+最大输入 / 输出长度与生成参数 & \todo{填写} \\
+检查点与适配器保存路径 & \todo{填写仓库内或实验存储路径} \\
+\bottomrule
+\end{tabularx}
+
+\subsubsection{基线、答案抽取与准确率}
+说明至少一个合理基线（例如未微调基础模型）的运行设置，并确保基线和微调模型使用相同测试集及一致的判分流程。定义答案抽取方法、数值或表达式规范化规则、等价答案处理方式及无法解析答案的处理方式。准确率按实际正确数除以测试样本总数计算：
+\[
+  \mathrm{Accuracy}=\frac{\text{判定正确的样本数}}{\text{测试样本总数}}.
+\]
+
+\section{实验结果与分析}
+
+\subsection{机器翻译结果与分析}
+
+\subsubsection{总体 BLEU 结果}
+下表中的数值必须来自实际测试集运行，并能从日志或保存的预测文件复核。
+
+\noindent\begin{tabularx}{\textwidth}{YYYY}
+\toprule
+模型 / 设置 & BLEU 实现与配置 & 测试样本数 & BLEU \\
+\midrule
+\todo{填写模型名称} & \todo{实现、版本、tokenization 等} & \todo{填写} & \todo{填写实际结果} \\
+\bottomrule
+\end{tabularx}
+
+结合实际数值讨论结果及其局限。不得将训练集结果、单次 smoke test 或未确认的运行结果作为正式测试结果。
+
+\subsubsection{翻译案例与错误分析}
+至少给出若干测试样本的源文、参考译文和模型译文，并分析具体错误。案例应来自保存的预测结果，不要挑选后改写成更好的输出。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.16\textwidth}YYY}
+\toprule
+样本 & 源文 & 参考译文 & 模型译文 \\
+\midrule
+1 & \todo{粘贴实际源文} & \todo{粘贴实际参考译文} & \todo{粘贴实际模型输出} \\
+2 & \todo{粘贴实际源文} & \todo{粘贴实际参考译文} & \todo{粘贴实际模型输出} \\
+3 & \todo{粘贴实际源文} & \todo{粘贴实际参考译文} & \todo{粘贴实际模型输出} \\
+\bottomrule
+\end{tabularx}
+
+针对案例分析词义选择、漏译、增译、语序、长句、专名或其他观察到的问题，并说明可能原因。没有证据支持的原因应表述为假设，而不是确定结论。
+
+\subsection{命名实体识别结果与分析}
+
+\subsubsection{实体级指标}
+至少报告总体实体级 Precision、Recall 和 F1，并写明汇总口径。若有多个实体类别，可同时报告分类别结果。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.24\textwidth}YYYY}
+\toprule
+类别 / 汇总口径 & Precision & Recall & F1 & 支持数 \\
+\midrule
+\todo{实体类别 1} & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+\todo{实体类别 2} & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+总体（\todo{micro / macro 等}） & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+\bottomrule
+\end{tabularx}
+
+说明评估数据、评估脚本或库的版本、实体匹配规则及 \texttt{O} 标签处理方式。数值应可由保存的预测结果独立复算。
+
+\subsubsection{错误分析}
+结合实际预测分析边界错误、类别混淆、未登录实体或 subword 对齐问题。可选取脱敏且可公开的样例；指出真实标签、预测标签、错误类型及可能原因。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.18\textwidth}YYY}
+\toprule
+文本片段 & 真实实体 / 标签 & 预测实体 / 标签 & 错误类型与分析 \\
+\midrule
+\todo{填写实际例子} & \todo{填写} & \todo{填写} & \todo{填写} \\
+\todo{填写实际例子} & \todo{填写} & \todo{填写} & \todo{填写} \\
+\bottomrule
+\end{tabularx}
+
+\subsection{LoRA 数学微调结果与分析}
+
+\subsubsection{测试集准确率与基线比较}
+只报告独立测试集上的结果，并注明测试样本数。若实验中没有运行某个基线，应如实说明，不得补造对比值。
+
+\noindent\begin{tabularx}{\textwidth}{YYYY}
+\toprule
+方法 & 正确数 / 测试总数 & Accuracy & 备注 \\
+\midrule
+\todo{未微调基线或其他基线} & \todo{填写} & \todo{填写} & \todo{模型和解码设置} \\
+LoRA 微调模型 & \todo{填写} & \todo{填写} & \todo{对应检查点或配置} \\
+\bottomrule
+\end{tabularx}
+
+解释基线和微调模型的差异时，结合实际样本与训练设置讨论。说明数据量、模型能力、提示模板、生成随机性及判分规则可能造成的影响；避免仅凭一个指标作过度结论。
+
+\subsubsection{答案判定案例与错误分析}
+展示若干实际测试样本的题目、模型答案、抽取答案、标准答案和判分结果。分析算术错误、推理错误、格式错误或答案抽取失败等观察到的情况。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.23\textwidth}YYYY}
+\toprule
+题目 / 样本编号 & 模型输出 & 抽取答案 / 标准答案 & 判定及错误分析 \\
+\midrule
+\todo{填写实际例子} & \todo{节选真实输出} & \todo{填写} & \todo{正确 / 错误及原因} \\
+\todo{填写实际例子} & \todo{节选真实输出} & \todo{填写} & \todo{正确 / 错误及原因} \\
+\bottomrule
+\end{tabularx}
+
+\subsection{运行验证与结果可追溯性}
+记录实际完成的格式检查、静态检查、关键逻辑测试、smoke test 和正式训练。明确哪些步骤尚未执行及原因；不要把未运行的步骤写成通过。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.27\textwidth}YY}
+\toprule
+检查项目 & 实际命令 / 路径 & 结果与证据位置 \\
+\midrule
+代码格式与静态检查 & \todo{填写实际命令} & \todo{填写通过、失败或未执行及日志位置} \\
+关键逻辑单元测试 & \todo{填写实际命令} & \todo{填写结果及日志位置} \\
+Smoke test & \todo{填写数据规模及实际命令} & \todo{填写结果；不得当作正式结果} \\
+正式训练与最终评估 & \todo{填写实际命令} & \todo{填写配置、日志、预测文件和检查点路径} \\
+指标独立复算 & \todo{填写评估命令} & \todo{填写结果文件及复算结果} \\
+\bottomrule
+\end{tabularx}
+
+\section{总结}
+从任务结构和方法原理看，机器翻译、命名实体识别和数学题参数高效微调分别对应条件序列生成、实体序列标注和生成模型适配；相应评价应使用与任务输出相匹配的 BLEU、实体级 Precision/Recall/F1 和答案准确率。Transformer、BERT 和 LoRA 为本课程任务提供了代表性建模路线，但方法背景本身不能证明具体实验有效。
+
+本节目前仅总结任务与文献层面的认识，不包含本组实验发现。完成数据准备和实际运行后，应补充三项实验是否达到目标、基线比较、典型错误、资源限制及结论；未运行或无法复核的内容不得写成实验结果。
+
+\section{组员分工}
+
+每组 3 人。请填写每位成员实际承担并完成的工作，避免使用无法核实的概括性分工。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.16\textwidth}p{0.20\textwidth}YY}
+\toprule
+姓名 & 学号 & 具体工作 & 可核验的产出或记录 \\
+\midrule
+\todo{组长姓名} & \todo{学号} & \todo{填写实际贡献} & \todo{代码、配置、分析或文档位置} \\
+\todo{组员姓名} & \todo{学号} & \todo{填写实际贡献} & \todo{代码、配置、分析或文档位置} \\
+\todo{组员姓名} & \todo{学号} & \todo{填写实际贡献} & \todo{代码、配置、分析或文档位置} \\
+\bottomrule
+\end{tabularx}
+
+\section*{工具与 AI 使用披露}
+\addcontentsline{toc}{section}{工具与 AI 使用披露}
+本报告框架及当前已撰写的摘要、第一章、第二章和总结由生成式 AI 协助整理和起草。组员须核对文献原文与书目信息，检查并修订生成内容，对最终提交的文本、引用和实验结论负责；其他 AI 使用情况及披露格式按课程和学校规定如实补充。
+
+\addcontentsline{toc}{section}{参考文献}
+\begin{thebibliography}{99}
+\item[] {\footnotesize 本文引用条目依据课程学习材料中的原始论文线索整理。当前环境无法连接外部文献站点，提交前请逐条对照论文原文或官方记录核验作者、出版信息、页码和链接；未核验的条目不要作为最终引用保留。}
+
+\bibitem{seq2seq} I. Sutskever, O. Vinyals, and Q. V. Le, ``Sequence to Sequence Learning with Neural Networks,'' in \textit{Advances in Neural Information Processing Systems 27}, 2014. Available: \url{https://arxiv.org/abs/1409.3215}.
+
+\bibitem{transformer} A. Vaswani et al., ``Attention Is All You Need,'' in \textit{Advances in Neural Information Processing Systems 30}, 2017. Available: \url{https://arxiv.org/abs/1706.03762}.
+
+\bibitem{bleu} K. Papineni, S. Roukos, T. Ward, and W.-J. Zhu, ``BLEU: a Method for Automatic Evaluation of Machine Translation,'' in \textit{Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics}, pp. 311--318, 2002. doi: 10.3115/1073083.1073135. Available: \url{https://aclanthology.org/P02-1040/}.
+
+\bibitem{bert} J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, ``BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding,'' in \textit{Proceedings of NAACL-HLT 2019}, pp. 4171--4186, 2019. doi: 10.18653/v1/N19-1423. Available: \url{https://aclanthology.org/N19-1423/}.
+
+\bibitem{instructgpt} L. Ouyang et al., ``Training Language Models to Follow Instructions with Human Feedback,'' in \textit{Advances in Neural Information Processing Systems 35}, pp. 27730--27744, 2022. Available: \url{https://arxiv.org/abs/2203.02155}.
+
+\bibitem{lora} E. J. Hu et al., ``LoRA: Low-Rank Adaptation of Large Language Models,'' in \textit{International Conference on Learning Representations (ICLR)}, 2022. Available: \url{https://arxiv.org/abs/2106.09685}.
+
+\bibitem{qlora} T. Dettmers et al., ``QLoRA: Efficient Finetuning of Quantized LLMs,'' in \textit{Advances in Neural Information Processing Systems 36}, 2023. Available: \url{https://arxiv.org/abs/2305.14314}.
+\end{thebibliography}
+
+\appendix
+\section{复现实验信息}
+填写可帮助他人复现实验的命令、配置和产物位置。注意不要在报告中暴露访问令牌、私有凭据或受许可限制的数据。
+
+\begin{itemize}
+  \item 项目代码版本 / Git commit：\todo{填写}
+  \item 机器翻译配置、训练日志、预测文件：\todo{填写路径}
+  \item NER 配置、训练日志、预测文件：\todo{填写路径}
+  \item LoRA 配置、训练日志、测试预测文件、适配器：\todo{填写路径}
+  \item 运行命令与评估命令：\todo{填写或指向仓库文档}
+\end{itemize}
+
+\end{document}

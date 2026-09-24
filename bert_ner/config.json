@@ -1,0 +1,11 @@
+{
+  "model_name": "bert-base-chinese",
+  "max_length": 256,
+  "learning_rate": 0.00005,
+  "epochs": 3,
+  "train_batch_size": 16,
+  "eval_batch_size": 32,
+  "weight_decay": 0.01,
+  "seed": 42,
+  "output_dir": "bert_ner/outputs/bert-base-chinese"
+}

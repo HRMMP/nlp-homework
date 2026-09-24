@@ -1,0 +1,4 @@
+torch>=2.2,<3.0
+datasets>=3.0,<5.0
+sentencepiece>=0.2,<0.3
+sacrebleu>=2.4,<3.0

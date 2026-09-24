@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700">
   <rect width="1400" height="700" fill="#f7fafc"/>
   <text x="70" y="64" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#16324f">注意力 mask：可见范围由任务决定</text>
-  <text x="70" y="105" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">绿色表示允许读取，浅灰表示被 mask；padding mask 与 causal mask 解决不同问题</text>
+  <text x="70" y="105" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">每个矩阵的有色格表示允许读取，浅灰表示被 mask；行是 Query，列是 Key</text>
   <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
     <text x="345" y="170" font-size="26" font-weight="700" fill="#1f4d7a">BERT Encoder：非因果</text>
     <text x="345" y="205" font-size="18" fill="#526579">每个有效位置可读取前后文</text>
@@ -31,5 +31,6 @@
     <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="16" fill="#526579" text-anchor="middle"><text x="31" y="335">t1</text><text x="93" y="335">t2</text><text x="155" y="335">t3</text><text x="217" y="335">t4</text><text x="279" y="335">pad</text><text x="-28" y="37">t1</text><text x="-28" y="99">t2</text><text x="-28" y="161">t3</text><text x="-28" y="223">t4</text><text x="-28" y="285">pad</text></g>
   </g>
   <rect x="270" y="615" width="860" height="48" rx="8" fill="#ffffff" stroke="#c9d4df" stroke-width="2"/>
-  <text x="700" y="647" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#374b60">padding mask：排除补齐位置；causal mask：排除未来位置；两者可以同时存在</text>
+  <text x="700" y="647" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#374b60">padding mask：屏蔽补齐 Key；causal mask：屏蔽未来 Key；两者可同时使用</text>
+  <text x="700" y="685" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="17" fill="#526579">图中也将无效 padding Query 置灰；实现通常由 loss 忽略其输出位置</text>
 </svg>

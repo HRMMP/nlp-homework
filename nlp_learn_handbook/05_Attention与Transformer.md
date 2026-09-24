@@ -2,7 +2,7 @@
 
 ## 1. Transformer 为什么重要
 
-Transformer 使用 Attention 建立序列中不同位置之间的联系，不依赖 RNN 的逐时间步循环，因此训练阶段更容易并行。它仍然需要处理顺序信息，所以要加入位置表示。
+Transformer 的重要性在于把已有 Attention 组织成可并行计算的 Encoder-Decoder 架构。神经机器翻译中的 Seq2Seq 和软对齐 Attention 早于 Transformer；它不是 Attention 的起点。推理生成仍需逐 token 使用前缀。
 
 一个 Encoder-Decoder Transformer 的整体数据流是：
 
@@ -33,9 +33,9 @@ Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k) + mask) V
 
 可以按三步理解：
 
-1. `Q K^T` 计算 Query 与各 Key 的匹配分数。
-2. 除以 `sqrt(d_k)` 控制数值尺度，再用 mask 排除不允许的位置。
-3. softmax 变成权重，对 Value 加权求和。
+1. `Q K^T` 计算每个 Query 与各 Key 的匹配分数；矩阵的行对应 Query，列对应 Key。
+2. 除以 `sqrt(d_k)` 控制数值尺度，再把禁止读取的位置屏蔽。
+3. softmax 沿 Key 位置归一化得到权重，对 Value 加权求和。
 
 `Q` 表示“我现在要找什么”，`K` 表示“每个位置能被怎样匹配”，`V` 表示“匹配后要读取的内容”。这是帮助理解的直觉，不是每个维度的固定语义。
 
@@ -122,18 +122,11 @@ Attention 负责混合不同位置的信息；FFN 提供逐位置的非线性变
 
 ## 7. Decoder 层和两个重要 mask
 
-Decoder 的目标 self-attention 需要 causal mask：位置 `t` 不能读取 `t+1` 及之后的真实目标词，否则训练时会偷看答案。
-
-还要处理 padding：
-
-- padding mask：不读取补齐位置。
-- causal mask：不读取未来位置。
-
-二者作用不同。机器翻译实现中，源 padding、目标 padding 和目标 causal mask 可能在不同 attention 调用中分别使用。
+Decoder 的目标 self-attention 需要 causal mask：预测位置 `t` 的下一个 token 时，不能读取未来目标 token。注意力分数通常形状为 `(B, heads, query_length, key_length)`；padding mask 屏蔽作为 Key/Value 的补齐位置，补齐 Query 的输出则通常由 loss 或后处理忽略。
 
 ![BERT 与 GPT 风格注意力 mask 的可见区域](./images/05-masks.svg)
 
-图 2：padding mask 排除补齐位置，causal mask 排除未来位置；它们不是同一个 mask。
+图 4：padding mask 屏蔽作为 Key/Value 的补齐位置，causal mask 屏蔽未来位置；补齐标签是否参与 loss 由 loss mask 单独控制。
 
 ## 8. 训练、损失和生成
 
@@ -184,4 +177,4 @@ Decoder 输入和标签错开：
 
 ![第 05 节 Transformer 总结](./images/summary-05-transformer.svg)
 
-图：本章总结 Transformer 从位置表示、Encoder、Decoder 到 logits 的计算路径及关键检查点。
+图 5：本章总结 Transformer 从位置表示、Encoder、含 masked self-attention 与 cross-attention 的 Decoder 到 logits 的计算路径。

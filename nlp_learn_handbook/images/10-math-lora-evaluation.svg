@@ -4,7 +4,7 @@
   <g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" text-anchor="middle">
     <rect x="70" y="190" width="190" height="100" rx="8" fill="#dff3f0" stroke="#3a9d96" stroke-width="3"/>
     <text x="165" y="230" font-size="24" font-weight="700" fill="#194c4b">题目</text>
-    <text x="165" y="265" font-size="19" fill="#194c4b">question + answer</text>
+    <text x="165" y="265" font-size="19" fill="#194c4b">question only</text>
     <rect x="315" y="190" width="190" height="100" rx="8" fill="#e4eefb" stroke="#4d82bd" stroke-width="3"/>
     <text x="410" y="230" font-size="24" font-weight="700" fill="#1f4d7a">Prompt</text>
     <text x="410" y="265" font-size="19" fill="#1f4d7a">模板版本</text>
@@ -38,5 +38,5 @@
     <path d="M480 530 H575 M815 530 H910"/>
     <path d="M565 520 L585 530 L565 540 M900 520 L920 530 L900 540"/>
   </g>
-  <text x="700" y="690" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">基线与 LoRA 必须共享测试题、prompt、生成参数、抽取规则和判分方法</text>
+  <text x="700" y="690" text-anchor="middle" font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="20" fill="#526579">训练答案进入 labels；评估参考答案只在 scoring 比较时使用，不进入 prompt</text>
 </svg>
