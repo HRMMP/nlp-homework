@@ -9,6 +9,12 @@
 \usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{fvextra}
+\usepackage{xurl}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage{fancyhdr}
 \usepackage{hyperref}
 
@@ -27,6 +33,13 @@
 \renewcommand{\arraystretch}{1.35}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcommand{\todo}[1]{\textcolor{red!70!black}{\textbf{[待填写：#1]}}}
+\tikzset{
+  flowbox/.style={draw=black!65, rounded corners=2pt, fill=blue!5,
+    align=center, text width=2.05cm, minimum height=1.05cm,
+    inner sep=4pt, font=\footnotesize},
+  flowarrow/.style={-{Latex[length=2mm]}, thick, draw=black!75},
+  auxarrow/.style={-{Latex[length=2mm]}, semithick, draw=black!60}
+}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -47,6 +60,8 @@
   {\zihao{1}\bfseries 实验报告\par}
   \vspace{1.8cm}
   {\zihao{3}机器翻译、命名实体识别与大模型参数高效微调\par}
+  \vspace{0.5cm}
+  {\small\color{red!65!black}审阅稿：运行数值已复算，解释与分工仍须组员核验\par}
   \vfill
   \renewcommand{\arraystretch}{1.8}
   \begin{tabular}{>{\raggedleft\arraybackslash}p{3.2cm}p{7.2cm}}
@@ -62,7 +77,7 @@
 \hypersetup{pageanchor=true}
 \pagenumbering{Roman}
 \begin{abstract}
-本文围绕自然语言处理课程要求的三个任务展开：基于 Transformer 的机器翻译、基于 BERT 的命名实体识别，以及在数学题任务中使用 LoRA 进行大语言模型参数高效微调。本文介绍三类任务的输入输出形式、研究脉络和评价关注点，并区分序列生成、序列标注与参数高效适配的不同问题结构。具体数据集、模型配置、实验结果和误差分析须依据本组实际方案及运行记录补充；本文当前稿不预设实验结论。
+为考察不同自然语言处理任务中模型设计与评价方式的差异，本文分别实现基于 Transformer 的 OPUS Books 翻译、基于 BERT 的 CLUENER2020 命名实体识别，以及基于 Qwen2.5-1.5B-Instruct 和 LoRA 的 GSM8K 数学题微调，并保存配置、逐样本预测与可独立复算的指标。原始翻译运行的 BLEU 为 13.78，但存在反向语向、疑似错配和跨集合重复；本轮按预先固定规则进行语言筛查和分组去重后重训，在新的 5,008 条测试记录上得到 BLEU 13.69、chrF++ 38.48。新旧测试集不同，分差不构成受控改进证据，语言筛查也不能证明语义完全对齐。NER 在 1,343 条开发集上的实体级 Precision、Recall 和 F1 分别为 77.16\%、80.18\% 和 78.64\%，并补充实体错误及训练中未见实体分析；开发集同时用于选模，不是独立测试表现。数学题实验修正前导小数点归一化错误后，严格准确率为基线 36.54\%、LoRA 49.58\%；最后数字抽取诊断则为 64.97\% 和 49.66\%。诊断并非官方基准成绩，但说明优劣顺序对判分协议敏感，现有证据不能单独证明数学推理能力提升。本文保留原始产物、旧评分及自动候选案例，组员仍须核查并以自己的理解修订分析。
 
 \noindent\textbf{关键词：} 机器翻译；命名实体识别；Transformer；BERT；LoRA
 \end{abstract}
@@ -76,7 +91,7 @@
 \subsection{研究背景}
 自然语言处理（Natural Language Processing, NLP）研究如何使计算机处理、分析和生成自然语言。与数值或图像等结构相对固定的数据不同，自然语言会受到词义、语境、语序、表达习惯和领域知识等因素影响。同一词语在不同上下文中可能有不同含义；同一含义也可能通过不同词语表达。因此，NLP 系统通常需要把文本转换为 token 序列，再学习输入文本与任务输出之间的对应关系。数据整理、文本切分、模型建模、输出解码和评价共同构成任务流程，任一环节处理不当都可能影响最后结果。
 
-本课程大作业包含机器翻译、命名实体识别和数学数据集上的大语言模型参数高效微调。三项任务分别代表了自然语言处理中三种不同的输出形式：机器翻译从源文本生成目标文本；命名实体识别从文本中抽取带边界和类别的结构化信息；数学题微调则要求生成式模型根据问题生成回答，并通过答案抽取和判分得到任务指标。序列到序列学习、Transformer、预训练语言模型及参数高效微调为这些任务提供了重要的方法基础\cite{seq2seq,transformer,bert,lora}。
+本课程大作业包含机器翻译、命名实体识别和数学数据集上的大语言模型参数高效微调。三项任务分别代表了自然语言处理中三种不同的输出形式：机器翻译从源文本生成目标文本；命名实体识别从文本中抽取带边界和类别的结构化信息；数学题微调则要求生成式模型根据问题生成回答，并通过答案抽取和判分得到任务指标。序列到序列学习、注意力机制、Transformer、预训练语言模型及参数高效微调为这些不同问题提供了方法基础\cite{seq2seq,bahdanau,transformer,bert,lora}。
 
 三项任务虽然可以使用共享的神经网络组件，但它们不能被视为同一个分类问题。翻译结果是一段目标语言序列，评价需要比较生成译文与参考译文；NER 输出的是一组实体跨度及其类别，评价关注边界和类别是否同时正确；数学题生成首先产生自由文本，还需定义从文本中抽取最终答案并进行判分的规则。因而，研究背景部分要先界定各任务的问题形式，后续方法和指标也必须与相应输出保持一致。下文介绍任务的一般定义和代表性方法，不据此推断本组已经完成某种具体实验。
 
@@ -87,25 +102,87 @@
 \]
 也就是说，模型在生成第 $t$ 个目标 token 时，既要利用源句信息，也要利用此前已经生成的目标前缀。这个定义表达了机器翻译的基本输入输出关系，并不预设具体的解码算法或模型配置。
 
-机器翻译的难点不仅是把源语言词语逐个替换成目标语言词语。不同语言在词汇、语序、形态和表达习惯上可能存在差异；源词还可能因上下文而具有不同含义。模型需要在保留原文关键信息的同时生成符合目标语言习惯的句子，处理专有名词、长距离依赖、漏译、重复和过早结束等问题。数据方面，平行句对的质量、训练与测试分布差异以及分词方式都会影响模型能够学习和评价的范围。因此，实验报告应明确源语言、目标语言、语料来源、数据划分、tokenizer 与预处理，而不能只写模型名称。
+机器翻译的难点不仅是把源语言词语逐个替换成目标语言词语。不同语言在词汇、语序、形态和表达习惯上可能存在差异；源词还可能因上下文而具有不同含义。模型需要在保留原文关键信息的同时生成符合目标语言习惯的句子，处理专有名词、长距离依赖、漏译、重复和过早结束等问题。数据方面，平行句对的质量、训练与测试分布差异以及分词方式都会影响模型能够学习和评价的范围。在本项目中，任务实例化为 OPUS Books 英译法；OPUS 是多来源平行语料及其工具资源，SentencePiece 则提供不依赖预先词边界的子词切分方法\cite{opus,opusbooks,sentencepiece}。数据版本、固定切分和分词配置见后续实验设计。
 
-课程要求使用 Transformer 实现机器翻译。评价方面，BLEU 通过比较候选译文与参考译文的 n-gram 重叠并加入长度惩罚形成自动评价分数\cite{bleu}。该分数适合对一组输出作可重复的汇总，但不能单独说明模型在哪些句子上正确或发生了何种错误。报告还应保留真实源句、参考译文和模型译文，说明 BLEU 的实现和计算配置，并结合案例分析译文质量。具体语言方向、数据集、分词和模型超参数须按本组实际方案填写。
+课程要求使用 Transformer 实现机器翻译。注意力式编码-解码模型把源句表示与目标端生成对齐，是从早期 Seq2Seq 到 Transformer 的重要研究脉络\cite{seq2seq,bahdanau,transformer}。本项目的数据输入、目标前缀、编码器输出和自动评价之间的关系如图~\ref{fig:nmt-flow} 所示。评价方面，BLEU 通过比较候选译文与参考译文的 n-gram 重叠并加入长度惩罚形成自动评价分数\cite{bleu}。该分数适合对一组输出作可重复的汇总，但不能单独说明模型在哪些句子上正确或发生了何种错误。分词、大小写、参考译文和实现差异会影响分数，因此报告应使用 SacreBLEU 等实现记录完整计算签名，并保留源句、参考译文和模型译文作案例分析\cite{post}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[flowbox, text width=2.8cm, minimum height=1.25cm] (src) at (0,0) {OPUS Books\\英语句子\\SentencePiece 子词 ID};
+    \node[flowbox, text width=2.8cm, minimum height=1.25cm] (enc) at (4.1,0) {Encoder $\times 3$\\Self-Attention + FFN};
+    \node[flowbox, text width=2.8cm, minimum height=1.25cm] (dec) at (8.2,0) {Decoder $\times 3$\\因果 Self-Attention\\Cross-Attention + FFN};
+    \node[flowbox, text width=2.8cm, minimum height=1.25cm] (eval) at (12.3,0) {生成法语译文\\SacreBLEU 对照参考译文};
+    \draw[flowarrow] (src) -- (enc);
+    \draw[flowarrow] (enc) -- node[above,font=\scriptsize]{源序列表示} (dec);
+    \draw[flowarrow] (dec) -- (eval);
+    \node[flowbox, text width=2.8cm, minimum height=0.75cm] (prefix) at (8.2,-2.35) {BOS / 已生成目标前缀};
+    \draw[auxarrow] (prefix.north) -- (dec.south);
+    \node[flowbox, text width=2.8cm, minimum height=0.75cm] (ref) at (12.3,-2.35) {测试集法语参考译文};
+    \draw[auxarrow] (ref.north) -- (eval.south);
+  \end{tikzpicture}
+  \caption{英译法 Transformer 流程示意图。模型结构据 Vaswani 等人的 Transformer 与 Bahdanau 等人的注意力翻译工作改绘；数据、分词、贪心解码和 SacreBLEU 环节对应本项目配置\cite{bahdanau,transformer,sentencepiece,post}。}
+  \label{fig:nmt-flow}
+\end{figure}
 
 \subsection{命名实体识别问题}
 命名实体识别（Named Entity Recognition, NER）旨在从文本中定位特定实体片段并判定其类别。常见实体包括人名、地点名和组织机构名，但实际类别集合由任务和数据集定义。若把句子表示为 token 序列 $w_1,\ldots,w_n$，NER 可以被建模为序列标注：模型对序列中各位置预测标签，再根据标签序列恢复实体的起止边界和类别。任务输出因此不只是“句子里出现了哪一类实体”，还包括实体具体出现的位置。
 
 BIO 和 BIOES 是常见的序列标注编码方式。以 BIO 为例，`B-X` 表示类别为 X 的实体开始，`I-X` 表示同一实体内部的后续位置，`O` 表示不属于实体；BIOES 进一步区分实体末尾和单 token 实体。不同数据集可能采用不同标签集合，也可能采用不同的分词粒度，因此标注方案必须和数据格式一起说明。实体边界错一个 token，或边界正确但类别预测错误，都会影响实体级评价。
 
-课程要求使用 BERT 完成 NER。常见实现是在预训练上下文表示上增加逐 token 分类层，并使用带标签的数据进行微调\cite{bert}。一个实际问题是 tokenizer 可能把原始标注单位（例如一个词）切分成多个 subword；实现需要规定标签如何映射到这些子词，哪些位置参与损失计算，以及如何把预测结果还原到原始文本。特殊 token、padding 和截断位置也不应误作为真实实体位置。
+课程要求使用 BERT 完成 NER。常见实现是在预训练上下文表示上增加逐 token 分类层，并使用带标签的数据进行微调\cite{bert}。早期神经序列标注研究以 BiLSTM、字符级表示和 CRF 标签解码联合识别实体；后续端到端 BiLSTM-CNN-CRF 架构进一步展示了从字符形态和上下文到标签序列的建模方式\cite{lample,mah_hovy}。本项目使用 CLUENER 2020 中文细粒度 NER 数据；其数据集论文介绍了该基准及中文细粒度实体类别，CLUE 则提供更广泛的中文语言理解评测背景。具体标注定义、版本和文件来源仍以 CLUENER 官方仓库说明为准\cite{cluener2020,clue,cluener_data}。tokenizer 可能将原始字符拆分为多个 subword，因此实现必须规定标签如何对齐，以及哪些位置参与损失和实体评估。
 
-NER 的评价应以实体为单位：预测实体通常只有在跨度和类别都与真实标注匹配时才计为正确。Precision 反映预测实体中正确实体的比例，Recall 反映真实实体中被找出的比例，F1 综合这两项指标。由于非实体位置（O 标签）可能占多数，token accuracy 单独使用时无法充分反映实体边界和类别识别质量。报告需要说明使用的标签方案、实体匹配规则、评估工具和汇总口径；具体数据集、类别及 subword 对齐策略应根据本组实际实验确定。
+NER 的评价应以实体为单位：预测实体通常只有在跨度和类别都与真实标注匹配时才计为正确。Precision 反映预测实体中正确实体的比例，Recall 反映真实实体中被找出的比例，F1 综合这两项指标。由于非实体位置（O 标签）可能占多数，token accuracy 单独使用时无法充分反映实体边界和类别识别质量。报告需要说明使用的标签方案、实体匹配规则、评估工具和汇总口径；本项目的字符标注、子词对齐和实体级评价路径见图~\ref{fig:ner-flow}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[flowbox, text width=2.85cm, minimum height=1.3cm] (source) at (0,0) {CLUENER 文本 + 字符跨度\\字符跨度转 BIO 标签};
+    \node[flowbox, text width=2.85cm, minimum height=1.3cm] (tokenizer) at (4.1,0) {Fast tokenizer\\字符切成 subword\\首子词保留标签，其余 / 特殊位为 -100};
+    \node[flowbox, text width=2.85cm, minimum height=1.3cm] (bert) at (8.2,0) {bert-base-chinese\\BERT + Token Classifier};
+    \node[flowbox, text width=2.85cm, minimum height=1.3cm] (metric) at (12.3,0) {预测 BIO 转实体跨度\\Strict entity P / R / F1};
+    \draw[flowarrow] (source) -- (tokenizer);
+    \draw[flowarrow] (tokenizer) -- (bert);
+    \draw[flowarrow] (bert) -- (metric);
+  \end{tikzpicture}
+  \caption{CLUENER 中文 NER 的 BERT 序列标注与评价流程。BERT 下游微调结构据 Devlin 等人的工作改绘，数据任务参考 CLUENER2020；子词忽略规则及实体指标按本项目实现绘制\cite{bert,cluener2020}。}
+  \label{fig:ner-flow}
+\end{figure}
 
 \subsection{数学题微调问题}
 本任务关注如何使生成式预训练模型针对数学题目生成回答，并评价抽取出的最终答案是否符合参考答案。设题目为 $q$，经过提示模板组织后的模型输入为 $p(q)$，模型生成文本为 $r$，答案抽取和规范化过程为 $g$，则参与判分的答案可以表示为 $a=g(r)$。从生成文本到准确率之间至少包含“题目输入、文本生成、答案抽取、答案比较”几个步骤；如果只保存最终准确率，就难以区分模型推理错误、输出格式不符合要求和解析器抽取失败。
 
 答案判定规则是该任务定义的一部分，而非无关紧要的后处理。例如，数字格式、分数表示、负号、单位或等价表达式的处理，都可能改变某个样本是否被判为正确。实验需要预先说明这些规则，保留原始生成文本、抽取答案、参考答案和逐样本判定结果，并确保最终准确率在独立测试集上计算。模型生成了解题过程并不自动意味着过程正确；如果报告只评价最终答案，也不应把答案正确率扩大解释为推理过程质量。
 
-LoRA（Low-Rank Adaptation）是在预训练模型权重上增加低秩可训练更新的一种参数高效微调方法。对权重矩阵 $W$，常见形式为 $W'=W+\frac{\alpha}{r}BA$，其中基础权重通常冻结，$A$ 和 $B$ 是新增的低秩矩阵，$r$ 是低秩维度，$\alpha$ 是缩放系数\cite{lora}。这一设计限制需要训练的参数范围，但不能保证特定数学数据集上的准确率必然提高。本课程要求在数学数据集上使用 LoRA 微调并在测试集统计准确率；基础模型、数据集、提示模板、可训练参数范围、对照基线和答案判定规则均须由本组实际方案确定并记录。
+LoRA（Low-Rank Adaptation）是在预训练模型权重上增加低秩可训练更新的一种参数高效微调方法。对权重矩阵 $W$，常见形式为 $W'=W+\frac{\alpha}{r}BA$，其中基础权重通常冻结，$A$ 和 $B$ 是新增的低秩矩阵，$r$ 是低秩维度，$\alpha$ 是缩放系数\cite{lora}。本项目在 GSM8K 数学题上使用 Qwen2.5-1.5B-Instruct 训练 LoRA adapter，并与未微调基础模型比较答案准确率；训练、对照生成、答案抽取和判分路径见图~\ref{fig:lora-flow}。GSM8K 原始研究与官方数据卡、思维链提示研究和 Qwen 技术报告分别为数据任务、生成过程和基础模型提供背景\cite{gsm8k,gsm8k_data,cot,qwen}。这些方法背景不意味着 LoRA 一定提高准确率，也不意味着答案正确率等同于推理过程正确。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \node[flowbox, text width=2.8cm, minimum height=1.15cm] (train) at (0,1.5) {GSM8K 训练题 + 解答};
+    \node[flowbox, text width=2.8cm, minimum height=1.15cm] (template) at (4.1,1.5) {Chat Template\\prompt 区域不计 loss};
+    \node[flowbox, text width=2.8cm, minimum height=1.15cm] (model) at (8.2,1.5) {Qwen2.5-1.5B\\基座冻结\\LoRA 训练 q\_proj / v\_proj};
+    \node[flowbox, text width=2.8cm, minimum height=1.15cm] (adapter) at (12.3,1.5) {保存训练后的 LoRA adapter};
+    \draw[flowarrow] (train) -- (template);
+    \draw[flowarrow] (template) -- (model);
+    \draw[flowarrow] (model) -- (adapter);
+
+    \node[flowbox, text width=2.3cm, minimum height=1cm] (test) at (0,-1.4) {GSM8K 测试题\\统一提示与解码};
+    \node[flowbox, text width=2.3cm, minimum height=0.8cm] (base) at (3.4,-0.65) {未微调基础模型};
+    \node[flowbox, text width=2.3cm, minimum height=0.8cm] (adapted) at (3.4,-2.15) {基础模型 + LoRA};
+    \node[flowbox, text width=2.3cm, minimum height=1cm] (raw) at (6.8,-1.4) {逐题原始生成文本};
+    \node[flowbox, text width=2.3cm, minimum height=1cm] (extract) at (10.2,-1.4) {抽取最终答案\\\texttt{\#\#\#\#} 优先 / boxed 回退};
+    \node[flowbox, text width=2.3cm, minimum height=1cm] (acc) at (12.75,-1.4) {与标准答案比较\\Accuracy};
+    \draw[flowarrow] (test.east) -- (base.west);
+    \draw[flowarrow] (test.east) -- ++(0.4,0) |- (adapted.west);
+    \draw[flowarrow] (base.east) -- (raw.west);
+    \draw[flowarrow] (adapted.east) -- ++(0.4,0) |- (raw.south);
+    \draw[flowarrow] (raw) -- (extract);
+    \draw[flowarrow] (extract) -- (acc);
+  \end{tikzpicture}
+  \caption{GSM8K 上的 LoRA 训练和对照评估流程。低秩适配机制据 Hu 等人的 LoRA 工作改绘；数据任务参考 GSM8K，基座模型与答案处理流程对应本项目配置\cite{lora,gsm8k,qwen}。}
+  \label{fig:lora-flow}
+\end{figure}
 
 \subsection{实验目标与研究问题}
 围绕课程规定的任务，本报告将分别从模型表示、数据处理和评价方式讨论以下问题：
@@ -115,21 +192,21 @@ LoRA（Low-Rank Adaptation）是在预训练模型权重上增加低秩可训练
   \item 对于数学题微调，LoRA 如何在限制可训练参数范围的同时适配生成模型？如何区分生成错误、答案抽取错误和判分规则造成的差异？
   \item 对于三项实验，如何记录数据来源、数据划分、软件环境、配置和逐样本预测，使指标能够追溯并独立复核？
 \end{enumerate}
-这些问题用于界定报告的讨论范围，并不代表本组已经完成相应训练或取得特定结果。实验章节应在实际方案和运行记录形成后，补充数据、配置、结果、误差案例及其证据。
+第三章给出上述问题对应的模型、数据和评价定义；第四章以保存的训练日志和逐样本预测回答效果与局限，附录给出独立复算入口。
 
 \section{目前的研究现状}
 
 \subsection{机器翻译相关研究}
-神经机器翻译把翻译建模为从源序列到目标序列的条件生成问题。序列到序列模型由编码部分表示输入，再由生成部分逐步产生输出，为端到端神经翻译提供了典型建模形式\cite{seq2seq}。这一形式能够处理源句与目标句长度不同的情况，但模型仍须建立源端信息与目标端生成步骤之间的联系。
+神经机器翻译把翻译建模为从源序列到目标序列的条件生成问题。Sutskever 等人的 Seq2Seq 模型通过编码器和解码器处理长度可变的输入输出序列；Bahdanau 等人随后以软注意力建立目标生成位置与源序列位置之间的动态关联，缓解单一固定向量作为信息瓶颈的问题\cite{seq2seq,bahdanau}。Vaswani 等人提出的 Transformer 以自注意力和交叉注意力构建编码器-解码器，不依赖循环状态逐位置更新，从而支持训练阶段对序列位置并行计算\cite{transformer}。这三项工作构成了本实验选择 Transformer 翻译模型的主要方法背景。
 
-Transformer 使用注意力机制构建 Encoder--Decoder 架构\cite{transformer}。Encoder 的自注意力用于整合源序列内部不同位置的信息；Decoder 的因果自注意力限制当前位置只能读取已生成的目标前缀，交叉注意力则让 Decoder 使用 Encoder 对源句形成的表示。位置表示为序列补充顺序信息，前馈网络、残差连接和归一化共同构成各层的基本计算单元。与逐步进行循环状态更新的架构相比，Transformer 的注意力计算可以在训练阶段并行处理多个序列位置；但自回归解码时，目标 token 仍需要按生成过程逐步产生。报告中应据本组实际代码或库说明哪些结构被实现或调用，不能仅凭“使用 Transformer”推定细节完全一致。
+数据与子词表示也是翻译系统的重要组成。OPUS 将多来源平行语料、处理工具和接口汇集为可访问的语言资源；本项目选取其中的 Books 英法子集，因而 OPUS 论文用于说明语料平台背景，而不是对该子集每本书的版权作结论\cite{opus}。SentencePiece 把子词模型训练直接建立在原始文本上，不要求输入预先按空格切词；本实验采用其 Unigram 子词模型并共享英法词表\cite{sentencepiece}。这些选择会影响词表覆盖和序列长度，实验应报告模型与预处理配置。
 
-自动评价方面，BLEU 根据候选译文与参考译文间不同阶 n-gram 的匹配情况计算分数，并通过长度惩罚降低过短候选译文带来的偏差\cite{bleu}。BLEU 提供了便于批量计算的共同尺度，但其数值受分词、大小写处理、参考译文数量、平滑和长度计算等配置影响；它衡量的是与参考文本的表面匹配，不能替代对含义、流畅度和具体错误的人工检查。因此，规范的机器翻译实验既应报告可复算的 BLEU 配置，也应保留逐样本预测，讨论漏译、错译、重复、专名和长句等真实现象，而不把单一分数解释为完整的翻译质量结论。
+评价方面，BLEU 以修正后的 n-gram 精确率和 brevity penalty 汇总候选译文与参考译文的表层重合程度\cite{bleu}。Post 指出，BLEU 数值若缺少 tokenization 等设置就难以跨论文直接比较，并推动通过 SacreBLEU 签名报告计算配置\cite{post}。因此，BLEU 是可复现的自动化汇总指标，但并不能完全代表语义忠实度或流畅度；本项目还需保留真实逐句译文并对观察到的错误作定性分析。
 
 \subsection{命名实体识别相关研究}
-NER 通常以序列标注方式处理：输入文本经过表示层后，各 token 的表示被映射到实体标签，再按约定的标签转移规则解码为实体跨度和类别。基于词典或人工特征的方法需要显式设计匹配规则；预训练语言模型路线则先从大规模文本中学习上下文表示，再使用下游标注数据进行任务微调。BERT 以双向 Transformer Encoder 建立上下文表示，并通过预训练后微调的范式用于多种语言理解任务，包括命名实体识别\cite{bert}。
+NER 的研究从规则、词典与特征工程方法逐步转向神经序列标注，再发展到预训练语言模型微调。Lample 等人将双向 LSTM、字符级表示与 CRF 用于序列标注；Ma 与 Hovy 提出端到端 BiLSTM-CNN-CRF，利用字符 CNN 表征词形并通过 CRF 建模标签序列依赖\cite{lample,mah_hovy}。BERT 则以双向 Transformer Encoder 进行预训练，之后可在下游标注数据上微调 token 分类器\cite{bert}。这些路线与本项目的 BERT token classification 形成方法脉络，但并不意味着本实现包含 CRF 解码。
 
-将 BERT 用于 token classification 时，分类层对每个有效位置的隐藏表示预测标签。此路线降低了为每个下游任务从头学习表示的需求，但不会自动解决标注质量、实体边界和数据分布问题。尤其在 tokenizer 输出 subword 而数据按词或字符标注时，首个子词、后续子词、特殊 token 和 padding 的训练与评估策略必须保持一致。否则标签长度可能与模型输入错位，或训练指标和最终实体指标对应不同对象。
+在中文任务和数据方面，CLUE 是面向中文语言理解的综合评测基准；与之相关但单独发布的 CLUENER2020 论文聚焦中文细粒度命名实体识别数据集及其基准\cite{clue,cluener2020}。本项目使用的数据有 10 个实体类别，来源、标注约定及许可仍需分别依据 CLUENER 官方论文和仓库核实\cite{cluener_data}。NER 综述总结了实体定义、方法与数据评估中的常见差异，因此跨数据集比较需要同时交代标签集、语料和匹配口径\cite{ner_survey}。
 
 实体级评价把预测标签还原为实体集合，并按边界和类别匹配计算 Precision、Recall 与 F1。边界不完整、类别混淆、实体漏检和误报会以不同方式影响这些指标，因此分类别指标与真实错误样例有助于解释总体分数。BIO/BIOES 选择、是否忽略 O 标签、严格或宽松的跨度匹配、micro 或 macro 汇总均会影响结果含义，应在报告中明确。本课程要求 BERT NER 并报告实体级指标；具体模型标识、数据集、标签体系和对齐策略仍须以实际实验设置为准。
 
@@ -144,240 +221,481 @@ NER 通常以序列标注方式处理：输入文本经过表示层后，各 tok
 
 QLoRA 进一步将量化后的基础模型与 LoRA 适配结合，研究在受限硬件条件下进行大模型微调的方案\cite{qlora}。它与 LoRA 的关系是对基础权重存储方式及微调流程的扩展，不应与本课程指定的 LoRA 任务混为一谈；若实验并未采用 QLoRA，也不应把相关量化设置写成本组实现。无论采用何种变体，都需报告基础模型、量化与适配器配置、实际可训练参数范围和运行条件。
 
-在数学题任务中，研究和工程评价还需要把生成、答案抽取与判分拆开。若基线模型和 LoRA 模型使用不同提示、解码参数或抽取规则，最终准确率的差异便不能简单归因于 LoRA。因而，对照实验应尽量保持测试样本与判分流程一致，保存原始生成文本和逐题判定记录，并明确数学表达式等价、格式规范化及抽取失败的处理规则。本课程要求测试集准确率，具体基础模型、数据划分和答案规则则由本组实际方案确定。
+大语言模型数学能力的评测需要把模型生成与答案判定结合起来。GSM8K 包含小学数学文字题及人工编写的逐步解答，原论文研究了训练结果验证器以提高解题采样的选择质量\cite{gsm8k}。Wei 等人的思维链提示工作展示了在大模型提示中引出中间推理步骤的做法，但生成解释文本本身并不能证明每一步有效\cite{cot}。本项目对 GSM8K 逐题生成答案，并用确定的答案抽取规则计分；因此，答案抽取失败、格式遵从和数学答案错误需要分别检查，而不能只依据汇总准确率归因于模型推理能力。
 
 \subsection{本实验方案定位}
 本课程大作业关注三种具有代表性的任务结构，而非要求提出新的模型结构：机器翻译关注条件序列生成，NER 关注实体边界和类型的结构化识别，数学题微调关注生成模型的任务适配及答案判定。相应地，三项任务的数据格式、预处理、模型输出和评价对象各不相同；BLEU、实体级 Precision/Recall/F1 和数学题 Accuracy 不能彼此替代。
 
-本报告的研究现状聚焦于与课程指定方法直接相关的代表工作，用于解释实验任务为何采用 Transformer、BERT 和 LoRA 作为讨论对象，不据此宣称这些方法是所有场景下的最优方案，也不声称本组实验具有研究创新性。后续章节应进一步把通用方法对应到本组真正选用的数据、模型、代码和配置，并用保存的运行记录支持结果分析。数据集与许可证、具体模型版本、标签和提示定义等没有实际依据的信息，应在确认后再写入实验方案。
+本报告的研究现状聚焦于与课程指定方法直接相关的代表工作，用于解释 Transformer、BERT 和 LoRA 的方法基础，不将其等同于覆盖全部最新研究的综述。第三章将这些方法对应到实际配置，第四章用保存的训练日志和预测分析效果；没有基线消融或独立证据的部分不作最优性或创新性结论。
 
 
 
 \section{模型与算法设计}
 
+本章按“数据如何变成模型输入、模型如何产生输出、输出如何被评价”的顺序介绍三项实验。三项任务共用可复现原则，但建模目标不同：翻译预测目标端 token 序列，NER 预测字符对应的实体标签，数学微调则训练因果语言模型续写解题文本并从生成结果中抽取答案。图~\ref{fig:design-overview}概括了三条路径；三个模型的内部模块结构分别见图~\ref{fig:transformer-architecture}、图~\ref{fig:bert-architecture} 和图~\ref{fig:lora-architecture}，端到端数据与评估流程见图~\ref{fig:nmt-flow}、图~\ref{fig:ner-flow}、图~\ref{fig:lora-flow}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[node distance=0.65cm]
+    \node[flowbox,text width=3.1cm,minimum height=1.15cm] (mt) {平行句对\\子词序列\\Transformer 条件生成};
+    \node[flowbox,text width=3.1cm,minimum height=1.15cm,right=of mt] (mtout) {法语译文\\贪心解码\\BLEU + 译例分析};
+    \node[flowbox,text width=3.1cm,minimum height=1.15cm,below=1.0cm of mt] (ner) {字符跨度\\BIO / subword 对齐\\BERT token 分类};
+    \node[flowbox,text width=3.1cm,minimum height=1.15cm,right=of ner] (nerout) {实体跨度与类别\\严格边界匹配\\Precision / Recall / F1};
+    \node[flowbox,text width=3.1cm,minimum height=1.15cm,below=1.0cm of ner] (lm) {题目 + 解答\\prompt 屏蔽\\冻结基座、训练 LoRA};
+    \node[flowbox,text width=3.1cm,minimum height=1.15cm,right=of lm] (lmout) {生成文本\\答案抽取与规范化\\测试集 Accuracy};
+    \draw[flowarrow] (mt) -- (mtout);
+    \draw[flowarrow] (ner) -- (nerout);
+    \draw[flowarrow] (lm) -- (lmout);
+  \end{tikzpicture}
+  \caption{三项实验从数据表示到任务评价的对应关系。}
+  \label{fig:design-overview}
+\end{figure}
+
 \subsection{实验环境与复现设置}
-填写实际运行环境。未记录或无法核实的项目请保留“待确认”，不要根据常见配置推测。
+运行产物记录了 Python 3.10.12。原始机器翻译运行记录 PyTorch 2.14.0+cu130 和 CUDA 13.0（设备标识 cuda:3）；本轮语言筛查版使用同一框架，在两次空闲检查通过的物理 GPU 0（RTX A6000）上完成 smoke、正式训练和测试生成，记录物理 UUID，进程内映射为 cuda:0。LoRA 原运行记录 Transformers 4.57.6 及 RTX A6000；NER 的环境文件记录 seqeval 1.2.2 和 CUDA 可用性，未记录当时具体 GPU 编号。下表保留原始运行口径，本轮新任务的完整启动信息在 job JSON 中。三个训练配置均使用随机种子 42。
 
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.26\textwidth}Y}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.17\textwidth}YYY}
 \toprule
-项目 & 实际配置 \\
+项目 & 机器翻译 & BERT-NER & LoRA \\
 \midrule
-操作系统与版本 & \todo{填写} \\
-Python 版本 & \todo{填写} \\
-深度学习框架及版本 & \todo{填写} \\
-CUDA / 加速设备 & \todo{填写；如未使用则注明} \\
-CPU、GPU 与内存 & \todo{填写实际设备型号及可用资源} \\
-随机种子 & \todo{填写；说明随机种子的设置范围} \\
-依赖清单或环境文件 & \todo{填写仓库路径及版本记录方式} \\
+Python & 3.10.12 & 3.10.12 & 3.10.12 \\
+PyTorch & 2.14.0+cu130 & 2.14.0+cu130 & 2.14.0+cu130 \\
+主要依赖 & Datasets 4.8.5；SentencePiece 0.2.2；SacreBLEU 2.6.0 & Transformers 4.57.6；Datasets 4.8.5；seqeval 1.2.2 & Transformers 4.57.6；PEFT 0.21.0；Accelerate 1.15.0；Datasets 4.8.5 \\
+设备记录 & CUDA 13.0；\texttt{cuda:3} & CUDA 13.0 可用；GPU 编号未记录 & CUDA 13.0；RTX A6000；本轮扫参仅 GPU 0 \\
+随机种子 & 42 & 42 & 42 \\
 \bottomrule
 \end{tabularx}
 
-\subsection{机器翻译实验设计}
+该环境信息摘自各任务保存的运行元数据，不据此推断三个实验使用了互相隔离的虚拟环境。配置中的随机种子用于固定可控的随机过程，但不保证所有硬件算子逐位一致。复现实验时应同时保存配置、数据清单、日志、预测文件和检查点。
 
-\subsubsection{数据集与预处理}
-\begin{itemize}
-  \item 数据集名称、版本及来源：\todo{填写可核验的信息和链接或文献}
-  \item 许可协议：\todo{填写许可证；未确认时注明待确认}
-  \item 源语言与目标语言：\todo{填写}
-  \item 训练集、验证集、测试集划分：\todo{填写样本数量、划分依据及是否使用官方划分}
-  \item 清洗、过滤和文本规范化：\todo{按实际步骤填写}
-  \item 分词器、词表构建方式及词表大小：\todo{填写}
-  \item 特殊 token 及其用途：\todo{填写，如 BOS、EOS、PAD、UNK 等实际使用项}
-\end{itemize}
+\subsection{机器翻译：英译法 Transformer}
 
-\subsubsection{Transformer 模型}
-说明模型结构的实现方式或所用库，并结合实际配置介绍 Encoder、Decoder、自注意力与交叉注意力、FFN、位置编码、残差连接和归一化。若使用现成模型或库，应指出具体名称、版本及自行实现的部分。
+\subsubsection{数据与输入表示}
+实验使用 Hugging Face 上的 \texttt{Helsinki-NLP/opus\_books} 英法配置。正式全量运行记录使用固定 revision（完整标识保存在运行数据清单），包含 127,085 对句子；按种子 42 随机打乱后切分为训练集 114,376 对、验证集 6,354 对和测试集 6,355 对，比例为 90\%、5\%、5\%。仓库当前默认配置最多取 20,000 对，因此报告中的全量划分对应正式运行记录，复现时应使用相同数据规模的配置。数据卡的 license 字段为 \texttt{other}，原始书籍权利状态仍需按来源逐项核实，故本报告不将其等同于某个已确认的标准许可证\cite{opus,opusbooks}。
 
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.31\textwidth}Y}
+源句和目标句使用同一个 SentencePiece Unigram 子词词表，词表上限为 8,000，仅由训练文本拟合。语言筛查版先进行 NFKC/空白归一化，要求两侧至少 10 个字母、最多 500 字符、字符长度比不超过 4；fastText lid.176.ftz 顶部预测须分别为 en/fr，且两侧分值至少 0.8\cite{fasttext_lid}。再去除完全相同文本与精确重复句对，将同源或同目标句的连通组置于同一集合。保留 100,141 对，按固定 seed 得到 90,126/5,007/5,008 条新划分，训练、评价读取带哈希的准备文件，不根据模型得分清洗，也不自动交换反向句对。
+
+新运行重新只用训练集拟合词表，架构与优化配置不变。特殊 token 的 ID 固定为 PAD=0、UNK=1、BOS=2、EOS=3；源序列以 EOS 结束，目标以 BOS 开始、EOS 结束，最大序列长度为 128。共享词表不意味着两种语言的 token 边界相同\cite{sentencepiece}。自动语言筛查不能证明句对语义对齐，也没有实现按书籍隔离；因此新版本仍须抽样复核，不能称为完全无噪声语料。
+
+\subsubsection{模型结构与训练目标}
+模型使用 PyTorch \texttt{torch.nn.Transformer} 的 Encoder-Decoder 结构，batch-first，Encoder 和 Decoder 各 3 层，模型维度 256、注意力头数 4、前馈网络维度 1,024、dropout 0.1；位置表示采用固定正弦位置编码。词嵌入把 token ID 映射为向量，位置编码补充序列次序。Encoder 自注意力整合源句上下文；Decoder 的因果自注意力屏蔽当前位置之后的目标 token，交叉注意力则读取 Encoder 输出。每层还包含 FFN、残差连接和层归一化。模型总参数和可训练参数均为 11,682,624，记录见 \texttt{model\_summary.json}。这些数值描述当前配置，不代表已与其他模型规模作效果比较\cite{transformer}。整体信息流见图~\ref{fig:transformer-architecture}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    scale=0.88,transform shape,
+    block/.style={draw=black!65,rounded corners=2pt,fill=blue!5,align=center,
+      minimum height=1.25cm,text width=2.35cm,inner sep=4pt,font=\scriptsize},
+    flowarrow/.style={-{Latex[length=2mm]},thick,draw=black!75},
+    auxarrow/.style={-{Latex[length=2mm]},semithick,draw=black!60}
+  ]
+    \node[block] (src) at (0,0) {英语源 token\\Embedding + 位置编码};
+    \node[block,text width=3.25cm,minimum height=3.4cm] (enc) at (4.2,0) {Encoder layer\\重复 3 层\\Multi-Head Self-Attention\\残差连接 + LayerNorm\\Position-wise FFN\\残差连接 + LayerNorm};
+    \node[block,text width=3.55cm,minimum height=4.0cm] (dec) at (9.1,0) {Decoder layer\\重复 3 层\\因果 Self-Attention\\残差连接 + LayerNorm\\Cross-Attention\\$Q$ 来自 Decoder\\$K,V$ 来自 Encoder\\残差连接 + LayerNorm\\FFN + 残差连接 + LayerNorm};
+    \node[block] (out) at (14,0) {Linear + Softmax\\下一目标 token 分布};
+    \node[block,text width=2.8cm] (tgt) at (9.1,-3.3) {BOS + 已生成法语前缀\\Embedding + 位置编码};
+    \draw[flowarrow] (src) -- (enc);
+    \draw[flowarrow] (enc.east) -- node[above,font=\scriptsize]{Encoder 表示} (dec.west);
+    \draw[flowarrow] (dec) -- (out);
+    \draw[flowarrow] (tgt) -- (dec.south);
+    \draw[auxarrow] (out.south) |- (tgt.east);
+  \end{tikzpicture}
+  \caption{本项目英译法 Transformer 的模块示意。Encoder 输出供 Decoder 交叉注意力读取；训练时使用目标右移序列，推理时将已生成前缀逐步送回 Decoder。每个堆叠层包含图示的注意力 / FFN 与残差归一化结构。}
+  \label{fig:transformer-architecture}
+\end{figure}
+
+训练采用 teacher forcing：对目标序列右移一位，将 \texttt{target[:-1]} 输入 Decoder，并以 \texttt{target[1:]} 作为监督标签。模型输出 logits，经忽略 PAD 标签的交叉熵计算损失。配置使用 Adam 优化器，学习率 $3\times10^{-4}$，权重衰减 $10^{-4}$，batch size 64，最多训练 12 轮，梯度范数裁剪为 1.0；每轮根据验证集 loss 选择最佳检查点，连续 3 轮未改善时 early stopping。测试集不参与训练和模型选择。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.29\textwidth}Y}
 \toprule
-配置项 & 实际设置 \\
+设计项 & 当前实现 / 配置 \\
 \midrule
-Encoder / Decoder 层数 & \todo{填写} \\
-模型维度、注意力头数、FFN 维度 & \todo{填写} \\
-位置编码方式 & \todo{填写} \\
-Dropout 与参数量 & \todo{填写} \\
-训练目标与损失函数 & \todo{填写，包括 teacher forcing 等实际策略} \\
-优化器、学习率与调度策略 & \todo{填写} \\
-Batch size、训练轮数、序列长度 & \todo{填写} \\
-解码方法及推理参数 & \todo{填写，如 beam size 或最大生成长度} \\
+数据及固定切分 & OPUS Books en-fr；正式全量运行；114,376 / 6,354 / 6,355 \\
+分词与长度 & 共享 SentencePiece Unigram；词表上限 8,000；最大长度 128 \\
+Transformer & Encoder 3 层、Decoder 3 层；$d_{model}=256$；4 头；FFN=1,024；正弦位置编码；dropout=0.1 \\
+优化与停止 & Adam；学习率 $3\times10^{-4}$；batch=64；最多 12 轮；梯度裁剪 1.0；验证 loss early stopping patience=3 \\
+生成与自动评价 & 贪心解码；SacreBLEU 单参考、4-gram、13a tokenizer、大小写敏感、exp smoothing \\
 \bottomrule
 \end{tabularx}
 
-\subsubsection{训练与 BLEU 评价}
-说明训练流程、模型选择依据和检查点保存方式。报告 BLEU 时，写明所用实现及版本、tokenization、大小写处理、\textit{n}-gram 配置、参考译文数量和长度惩罚等配置；测试集只用于最终评价。
-
-\subsection{命名实体识别实验设计}
-
-\subsubsection{数据集与标签方案}
-\begin{itemize}
-  \item 数据集名称、来源、许可协议及文本语言：\todo{填写}
-  \item 训练集、验证集、测试集规模与划分方式：\todo{填写}
-  \item 实体类别及标签集合：\todo{填写}
-  \item 标注方案：\todo{明确 BIO 或 BIOES，并给出标签含义}
-  \item 文本预处理及最大序列长度：\todo{填写}
-\end{itemize}
-
-\subsubsection{BERT 模型与标签对齐}
-填写预训练模型名称、来源和版本，说明 token classification 输出层、训练目标和微调策略。明确 tokenizer 将词切分为 subword 后如何对齐标签，如何处理特殊 token、padding、被截断 token，以及损失计算中哪些位置会被忽略。
-
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.31\textwidth}Y}
-\toprule
-配置项 & 实际设置 \\
-\midrule
-预训练模型与 tokenizer & \todo{填写名称、版本或模型标识} \\
-最大序列长度与截断策略 & \todo{填写} \\
-Subword 标签对齐策略 & \todo{填写；说明首个 subword、其余 subword 的处理} \\
-损失函数与忽略标签 & \todo{填写，包括 padding / special token 的处理} \\
-优化器、学习率、Batch size、轮数 & \todo{填写} \\
-随机种子、最佳模型选择规则 & \todo{填写} \\
-\bottomrule
-\end{tabularx}
-
-\subsubsection{实体级评价指标}
-报告实体级 Precision、Recall 和 F1。说明评估库及版本、实体边界和类别是否必须同时匹配、是否忽略 \texttt{O} 标签，以及采用 micro、macro 或其他汇总方式。Token accuracy 可作为补充，不可替代实体级指标。
-
-\subsection{数学数据集上的 LoRA 微调设计}
-
-\subsubsection{基础模型、数据与提示格式}
-\begin{itemize}
-  \item 基础模型名称、版本、来源与许可：\todo{填写}
-  \item 数学数据集名称、来源、许可与样本规模：\todo{填写}
-  \item 训练、验证、测试划分及防止数据泄漏的措施：\todo{填写}
-  \item 输入提示模板：\todo{给出实际模板，明确题目、指令和答案格式}
-  \item 训练目标及目标文本构造：\todo{填写}
-\end{itemize}
-
-\subsubsection{LoRA 与训练设置}
-说明 LoRA 的插入位置和冻结策略，给出可训练参数范围，并报告可训练参数数量及其占总参数的比例。说明生成配置与训练配置；不要只写 LoRA 参数而省略基础模型和目标模块。
-
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.34\textwidth}Y}
-\toprule
-配置项 & 实际设置 \\
-\midrule
-LoRA rank $r$、alpha、dropout & \todo{填写} \\
-目标模块 & \todo{填写具体模块名} \\
-冻结参数与可训练参数范围 & \todo{填写；说明检查方式} \\
-可训练参数数量 / 总参数数量 & \todo{填写实际统计值} \\
-优化器、学习率、Batch size、轮数 & \todo{填写} \\
-最大输入 / 输出长度与生成参数 & \todo{填写} \\
-检查点与适配器保存路径 & \todo{填写仓库内或实验存储路径} \\
-\bottomrule
-\end{tabularx}
-
-\subsubsection{基线、答案抽取与准确率}
-说明至少一个合理基线（例如未微调基础模型）的运行设置，并确保基线和微调模型使用相同测试集及一致的判分流程。定义答案抽取方法、数值或表达式规范化规则、等价答案处理方式及无法解析答案的处理方式。准确率按实际正确数除以测试样本总数计算：
+训练目标是对非 PAD 目标位置的平均负对数似然：
 \[
-  \mathrm{Accuracy}=\frac{\text{判定正确的样本数}}{\text{测试样本总数}}.
+  \mathcal{L}_{\mathrm{MT}}=-\frac{1}{|\mathcal{T}|}
+  \sum_{t\in\mathcal{T}}\log p_\theta(y_t\mid y_{<t},x),
 \]
+其中 $\mathcal{T}$ 为批次中有效目标位置集合。注意力以
+$\operatorname{softmax}(QK^{\mathsf T}/\sqrt{d_k}+M)V$ 汇聚信息；因果 mask 在未来位置给出屏蔽值，padding mask 排除补齐位置。训练使用参考前缀，生成使用模型自身前缀，后者的错误可能逐步累积。因此验证 loss 下降不保证所有长句翻译都正确。
+
+\subsubsection{解码与评价设计}
+推理采用贪心解码：每一步选择当前概率最大的下一个 token，生成 EOS 时停止，或达到最大长度时截断。贪心解码实现简单、输出确定，但不保证找到全局概率最高的完整句子。评价使用 SacreBLEU 对测试集预测与单条参考译文计分，配置为 4-gram、13a tokenizer、大小写敏感、exp smoothing，并保存完整签名；同时保留源句、参考译文与模型译文，以便检视 BLEU 无法表达的具体漏译、错译或重复问题\cite{bleu,post}。这些是预先规定的评价方法，具体分数和案例属于第四章，不能由配置推得。
+
+\subsection{命名实体识别：BERT 序列标注}
+
+\subsubsection{数据、实体标签与对齐}
+NER 使用本地 CLUENER 2020 中文细粒度数据。当前数据文件包含训练集 10,748 条、开发集 1,343 条和无标签测试集 1,345 条。test 文件不提供 gold 标签，因此只能用于预测，不能计算测试集 Precision、Recall 或 F1；当前实现以 dev 进行模型选择。数据包未附明确许可证文件，使用及再分发许可待向上游确认。十类实体为 address、book、company、game、government、movie、name、organization、position、scene。原始标注给出字符闭区间跨度，程序先校验跨度是否能还原标注文本，再转成 IOB2/BIO 标签：每类使用 B、I 两种标签，并包含 O，共 21 类标签\cite{cluener2020,cluener_data}。
+
+数据处理将中文句子拆成字符列表，再以 fast tokenizer 的 \texttt{word\_ids()} 把字符位置映射到 BERT subword 序列。每个字符对应的首个 subword 保留该字符 BIO 标签；同一字符的后续 subword、特殊 token 和无对应字符的位置设为 -100，从而不参与交叉熵损失及评估。最大长度为 256，超长输入按 tokenizer 的截断策略处理。数据中存在 1 条含嵌套实体的训练样本，而扁平 BIO 无法同时表达重叠跨度；现有转换保留较长外层实体并计数。该信息是标注表示的限制，应在结果讨论中披露，而不能误认为嵌套实体已被完整建模。
+
+\subsubsection{BERT 分类器与训练流程}
+模型标识为 \texttt{bert-base-chinese}，在预训练 BERT 的逐 token 隐状态上接分类层，对每个保留标签的位置预测 21 类之一。训练配置的最大长度为 256、学习率 $5\times10^{-5}$、训练 batch size 16、评估 batch size 32、weight decay 0.01、最多 3 轮、随机种子 42。训练时使用标注训练集计算 token 分类交叉熵，并在每轮结束后对 dev 还原实体、计算 strict IOB2 实体级 F1，按 F1 选择最佳检查点。当前实现没有 CRF 解码层，不能将相关综述中的 CRF 方法描述成该实验组件\cite{bert}。BERT 编码与标签预测结构如图~\ref{fig:bert-architecture}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.94,transform shape,
+    block/.style={draw=black!65,rounded corners=2pt,fill=blue!5,align=center,
+      minimum height=1.15cm,text width=2.35cm,inner sep=4pt,font=\scriptsize},
+    flowarrow/.style={-{Latex[length=2mm]},thick,draw=black!75}
+  ]
+    \node[block] (chars) at (0,0) {原始句子\\字符序列与 BIO 标签};
+    \node[block] (subwords) at (3.35,0) {Tokenizer\\CLS + 字符 subword + SEP\\首子词对齐标签};
+    \node[block,text width=2.5cm,minimum height=1.55cm] (bert) at (6.8,0) {BERT Encoder\\12 层双向上下文表示\\读取有效 subword};
+    \node[block] (head) at (10.15,0) {Linear + Softmax\\21 类 token 标签};
+    \node[block] (entities) at (13.5,0) {BIO 解码\\实体类别 + 字符跨度};
+    \draw[flowarrow] (chars) -- (subwords);
+    \draw[flowarrow] (subwords) -- (bert);
+    \draw[flowarrow] (bert) -- (head);
+    \draw[flowarrow] (head) -- (entities);
+    \node[font=\scriptsize,align=center,text width=8.5cm] at (6.8,-1.45) {首子词计算分类损失；后续子词和特殊位置忽略};
+  \end{tikzpicture}
+  \caption{本项目 BERT-NER 的输入、编码和分类头示意。每个汉字作为 tokenizer 的 word 单位；只有该字符首个 subword 的标签参与损失与实体评估。}
+  \label{fig:bert-architecture}
+\end{figure}
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.29\textwidth}Y}
+\toprule
+设计项 & 当前实现 / 配置 \\
+\midrule
+数据划分 & train 10,748；dev 1,343；无标签 test 1,345 \\
+实体编码 & 10 类实体；BIO/IOB2；21 个标签（含 O） \\
+模型与输入 & \texttt{bert-base-chinese} + token classification；最大长度 256 \\
+对齐与损失 & 每字符首 subword 参与；后续 subword / special token 忽略值 -100；交叉熵 \\
+优化与选模 & 学习率 $5\times10^{-5}$；train/eval batch=16/32；最多 3 轮；dev strict entity F1 选模 \\
+数据限制 & 1 条嵌套实体无法由扁平 BIO 同时表示；保留较长跨度；test 无标签 \\
+\bottomrule
+\end{tabularx}
+
+\subsubsection{实体级评价}
+预测 token 标签先按 BIO 规则还原为实体类别与字符跨度，再由 \texttt{seqeval} 按 strict IOB2 计算 micro Precision、Recall 和 F1。一个预测实体只有在起止边界和类别都与 gold 实体一致时才算正确；O 不作为实体计入分子类别。strict 匹配能体现边界错误，但总体指标不能替代分类别支持数和实际错误样例。由于当前 test 无标签，开发集上的指标用于选模和流程验证，不应称为独立测试集结果。
+
+位置标签忽略只作用于损失与计分，不表示 BERT 不读取特殊 token 或后续 subword。分类头将隐状态 $h_i$ 映射为 $p_i=\operatorname{softmax}(Uh_i+b)$；仅在 gold 标签不为 $-100$ 的位置计算交叉熵。设跨全体句子累计的严格实体匹配数为 TP，额外预测为 FP，漏检为 FN，则
+\[
+ P=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}},\qquad
+ R=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}},\qquad
+ F_1=\frac{2PR}{P+R}.
+\]
+这也是 micro 汇总的定义，支持数是 gold 实体个数而非句子数。
+
+\subsection{数学数据集：LoRA 参数高效微调}
+
+\subsubsection{数据组织与提示构造}
+实验使用 \texttt{openai/gsm8k} 的 \texttt{main} 配置，固定 revision，版本标识记录在数据配置文件中。训练脚本从官方 7,473 条训练样本中按种子 42 和 10\% 验证比例划出 6,725 条训练题、748 条验证题；官方 1,319 条 test 未用于训练，曾用于原始配置与基础模型的对照评估。由于之后已查看该测试集及错误案例，后续学习率选择只依据验证集，并将已有测试结果按探索性结果解释。GSM8K 数据卡标注 MIT 许可证\cite{gsm8k,gsm8k_data}。
+
+基础模型为 \texttt{Qwen/Qwen2.5-1.5B-Instruct}，模型 revision 固定，完整值见配置文件。对话输入通过模型自带 Chat Template 构造，system 指令要求逐步解题，并在最后一行按 \texttt{\#\#\#\# <number>} 输出答案；user 内容将题目字段替换为具体题目。训练目标是 assistant 解题文本与最终答案。prompt 区域标签设为 -100，不计入自回归语言模型损失；assistant 区域参与 next-token loss。训练时完整对话（含问题与解答）上限为 1,024 token，超长样本在预处理时会报错；生成时输入上限为 1,024 token、最大新生成长度为 512 token，评估入口会截断超长输入。当前预测文件未逐题保存 token 数和停止原因，不能仅凭抽取失败判断是否触及生成上限。这里训练模型学习的是答案文本续写，不是直接对数值标签进行分类\cite{qwen,gsm8k}。
+
+\subsubsection{LoRA 结构与优化}
+对线性权重 $W$，LoRA 以低秩矩阵 $A$、$B$ 表示可训练增量：
+\[
+  W'=W+\frac{\alpha}{r}BA.
+\]
+其中 $r$ 为秩，$\alpha$ 控制增量缩放。该实验冻结基础模型，仅在每层注意力的 \texttt{q\_proj} 和 \texttt{v\_proj} 加入 LoRA 分支，设 $r=8$、$\alpha=16$、dropout=0.05、bias=\texttt{none}。正式运行参数审计记录含适配器的模型总参数 1,544,803,840、可训练参数 1,089,536，占总参数约 0.0705\%；该统计对应本次保存的 adapter 配置\cite{lora}。LoRA 在线性层中的冻结权重和可训练旁路见图~\ref{fig:lora-architecture}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+    block/.style={draw=black!65,rounded corners=2pt,fill=blue!5,align=center,
+      minimum height=0.9cm,text width=2.25cm,inner sep=4pt,font=\scriptsize},
+    adapter/.style={draw=green!45!black,rounded corners=2pt,fill=green!8,align=center,
+      minimum height=0.9cm,text width=2.0cm,inner sep=4pt,font=\scriptsize},
+    flowarrow/.style={-{Latex[length=2mm]},thick,draw=black!75},
+    learnarrow/.style={-{Latex[length=2mm]},thick,draw=green!50!black}
+  ]
+    \node[block] (x) at (0,0) {输入向量 $x$};
+    \node[block] (w) at (4,1.25) {冻结基座权重 $W$\\线性变换 $Wx$};
+    \node[adapter] (a) at (4,-1.25) {可训练矩阵 $A$\\降维 $d \to r$};
+    \node[adapter] (b) at (7,-1.25) {可训练矩阵 $B$\\升维 $r \to d'$};
+    \node[block,text width=1.25cm] (sum) at (10,0) {$+$\\相加};
+    \node[block] (y) at (13,0) {输出\\$Wx + (\alpha/r)BAx$};
+    \draw[flowarrow] (x.east) -- ++(0.7,0) |- (w.west);
+    \draw[flowarrow] (w.east) -- ++(0.7,0) |- (sum.north);
+    \draw[flowarrow] (x.east) -- ++(0.7,0) |- (a.west);
+    \node[font=\scriptsize] at (2.05,-1.8) {dropout};
+    \draw[learnarrow] (a.east) -- (b.west);
+    \draw[learnarrow] (b.east) -- ++(0.7,0) |- (sum.south);
+    \node[font=\scriptsize] at (8.8,-1.65) {$\alpha/r$};
+    \draw[flowarrow] (sum) -- (y);
+  \end{tikzpicture}
+  \caption{LoRA 在线性层上的低秩旁路。适配器位于 Qwen 各层注意力的 query/value 投影，基础权重冻结。PEFT 在训练时先对旁路输入应用 dropout，再经过 $A$、$B$；推理时关闭 dropout，输出为图示公式。}
+  \label{fig:lora-architecture}
+\end{figure}
+
+原始配置采用学习率 $2\times10^{-4}$、weight decay 0.01、warmup ratio 0.03、1 个 epoch、单设备 batch size 2 和梯度累积 8 步（名义有效 batch size 为 16，未计其他并行设备）。学习率 $\mathrm{lr}$ 控制优化器每次更新 LoRA 可训练参数的步幅，与控制低秩矩阵维度的 $r$ 不是同一个量；$2\times10^{-4}$、$1\times10^{-4}$ 和 $5\times10^{-5}$ 分别对应 0.0002、0.0001 和 0.00005。每轮在验证集评估并按训练脚本保存 adapter；在支持时按硬件能力启用混合精度。训练完成后，LoRA adapter 与 tokenizer 单独保存，基座权重保持冻结。可训练参数范围通过 PEFT 参数统计记录核查，而不是根据配置名称推断。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.31\textwidth}Y}
+\toprule
+设计项 & 当前实现 / 配置 \\
+\midrule
+数据 & GSM8K main；train/validation=6,725/748；官方 test=1,319 \\
+基座 & Qwen2.5-1.5B-Instruct；固定模型 revision；Chat Template \\
+LoRA & $r=8$；$\alpha=16$；dropout=0.05；目标模块 \texttt{q\_proj}、\texttt{v\_proj}；冻结基座 \\
+参数审计 & 总参数 1,544,803,840；可训练 1,089,536（约 0.0705\%） \\
+训练 & 学习率 $2\times10^{-4}$；batch=2；梯度累积=8；1 epoch；seed=42 \\
+提示与损失 & system 要求逐步解题及 \texttt{\#\#\#\#} 答案；prompt mask=-100；assistant 文本计算 causal LM loss \\
+\bottomrule
+\end{tabularx}
+
+仅在 assistant 解答 token 上优化负对数似然，基础模型仍参与前向计算及梯度传播，但权重不更新。\texttt{q\_proj} 与 \texttt{v\_proj} 分别生成 Query 和 Value；本配置没有给 key/output 投影、FFN、词嵌入或语言模型输出头增加可训练 LoRA 分支。\texttt{lr} 是优化器步幅参数，$r$ 控制容量，$\alpha/r$ 控制增量缩放，三者作用不同。日志中的学习率经 warmup 与调度而变化，配置值不表示每一步都使用该数值。
+
+\subsubsection{基线与答案评价规则}
+对照基线为相同基础模型但不加载 adapter；基线和 LoRA 模型使用相同 GSM8K 官方测试题、提示、生成参数和答案判定流程，以减少比较条件差异。预测优先抽取最后一个 \texttt{\#\#\#\#} 后的内容；若没有该标记，则回退到 boxed 格式中的答案；均未找到时记为抽取失败。整数和小数去除数字内部千位逗号，分数按精确分数比较，Markdown 反引号或粗体包裹会先移除，其他单位或文本不静默删除。抽取失败计入总测试样本分母并判错，同时另记格式可抽取率和错误类别。该规则偏重格式可解析的最终答案，不等价于逐步推理正确性；基线比较需结合抽取失败数和原始生成案例解释\cite{gsm8k}。
+
+为了把格式问题和最终答案问题分开，设总题数为 $N$、成功抽取数为 $E$、判对数为 $C$，报告
+\[
+ \mathrm{Accuracy}=C/N,\qquad \mathrm{ExtractRate}=E/N,\qquad
+ \mathrm{Acc}_{\mathrm{extracted}}=C/E\quad(E>0).
+\]
+当前实现用 \texttt{format\_compliance\_rate} 命名 $E/N$；本报告称其为“格式可抽取率”，以免误认为它检查了完整输出格式。单位、等价数学表达式和数值规范化的边界以评分代码为准，评分器未覆盖所有符号表达式。
+
+该章节描述代码、配置与运行清单所定义的方法。三项实验目前均有训练产物：翻译有全量训练和测试预测，NER 有训练检查点与 dev 预测，LoRA 有参数统计及测试预测文件。NER 官方 test 无标签，不能得出官方测试集实体指标；翻译记录存在语向或句对对齐待核实的问题。各结果及其限制在下一章从结构化记录中复核，不应因配置名或单一分数推断实验效果。
 
 \section{实验结果与分析}
 
+以下数字来自当前仓库的结构化运行产物，并非对所有错误原因的最终判定。各项指标的评价集合不同：翻译使用固定切分的测试集；NER 只能使用带标签 dev；数学题已有基础模型与原始 LoRA 的官方 test 对照，以及仅在 validation 上进行的学习率比较。组员提交前仍须核查样本、数据来源及分析文字。
+
 \subsection{机器翻译结果与分析}
 
-\subsubsection{总体 BLEU 结果}
-下表中的数值必须来自实际测试集运行，并能从日志或保存的预测文件复核。
+\subsubsection{训练过程与总体 BLEU}
+全量 OPUS Books \texttt{en-fr} 配置按固定种子切分为 114,376 / 6,354 / 6,355 对。训练进行 12 轮，保存的最佳检查点位于第 12 轮，验证 loss 为 2.5230。按保存的测试集逐句预测，使用 SacreBLEU 2.6.0 独立复算得到以下结果；这里 BLEU 是语料级得分，不是译对句子的百分比。
+
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.26\textwidth}YY}
+\toprule
+运行目录 & 测试集规模 & SacreBLEU \\
+\midrule
+\path{en-fr-full-seed42/}（12 轮） & 6,355 & 13.78 \\
+\bottomrule
+\end{tabularx}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[width=0.86\textwidth,height=6cm,xlabel={Epoch},ylabel={Cross-entropy loss},
+ xmin=1,xmax=12,xtick={1,4,8,12},grid=major,legend pos=north east]
+\addplot[blue,thick,mark=*] table[x=epoch,y=train_loss,col sep=comma]{reports/evidence/translation_loss.csv};
+\addlegendentry{Train}
+\addplot[red,thick,mark=square*] table[x=epoch,y=validation_loss,col sep=comma]{reports/evidence/translation_loss.csv};
+\addlegendentry{Validation}
+\end{axis}
+\end{tikzpicture}
+\caption{翻译运行的 12 轮训练与验证 loss。数据来自保存的 history.json，由复算脚本导出为 CSV。}
+\label{fig:mt-loss}
+\end{figure}
+
+训练 loss 从 4.9645 降至 2.5868，验证 loss 从 4.2874 降至 2.5230，各轮验证值持续下降，最终按验证 loss 选择第 12 轮（图~\ref{fig:mt-loss}）。此记录没有显示在 12 轮内触发 early stopping，也不能仅凭这段曲线推断继续训练一定改善 BLEU。训练使用 dropout 而验证关闭，二者还受聚合方式影响，不能将验证 loss 较低简单解释为数据泄漏。
+
+签名为 \path{nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0}，即单参考、大小写敏感、13a 分词、4-gram、exp 平滑；长度惩罚为 0.9577。预测在 \path{machine_translation/outputs/en-fr-full-seed42/predictions.test.jsonl}，配置、训练日志和独立复算指标同目录可查。另一 \path{en-fr-formal-seed42/} 运行仅取 20,000 对中的 1,000 条测试句、BLEU 为 2.73；划分与数据规模不同，不能直接拿这两个分数说明模型改进。
+
+\subsubsection{语言筛查与分组去重后的重训}
+原始切分审计发现 train/test 共有 45 个精确句对键，在 test 中出现 52 次。本轮在训练前固定上述筛查规则，从 127,085 对中保留 100,141 对；排除类别是按规则优先顺序分配的自动标签，不是人工确认的错误类别。其中语言标签反向 8,934 对、低语言分值 11,000 对、其他预测语向 2,086 对；其他规则排除过短 3,417、过长 1,351、长度比例 66、同文 49、重复句对 41。各计数相加与保留数等于输入总数。
 
 \noindent\begin{tabularx}{\textwidth}{YYYY}
 \toprule
-模型 / 设置 & BLEU 实现与配置 & 测试样本数 & BLEU \\
+运行版本 & 测试集规模 & BLEU & chrF++ \\
 \midrule
-\todo{填写模型名称} & \todo{实现、版本、tokenization 等} & \todo{填写} & \todo{填写实际结果} \\
+原始句对随机切分 & 6,355 & 13.78 & 未计算 \\
+语言筛查与分组去重 & 5,008 & 13.69 & 38.48 \\
 \bottomrule
 \end{tabularx}
 
-结合实际数值讨论结果及其局限。不得将训练集结果、单次 smoke test 或未确认的运行结果作为正式测试结果。
+新版本在三部分之间的精确句对、源句和目标句交集均为 0。完整重建的 manifest、三个切分、排除记录和抽样文件 SHA-256 均一致。新模型训练 12 轮，最终 train/validation loss 为 2.5252/2.4438，最佳检查点为第 12 轮；各轮训练与验证耗时之和为 826.96 秒，不包括分词器拟合及测试生成。完整测试 BLEU 13.69 的签名与原始运行相同，长度惩罚为 1；chrF++ 使用 SacreBLEU 默认字符阶数 6、词阶数 2、beta=2，完整签名在证据 JSON 中。新旧测试样本、词表和训练数据均发生变化，不能把分差解释为受控的模型提升或退步。
 
-\subsubsection{翻译案例与错误分析}
-至少给出若干测试样本的源文、参考译文和模型译文，并分析具体错误。案例应来自保存的预测结果，不要挑选后改写成更好的输出。
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[width=0.86\textwidth,height=6cm,xlabel={Epoch},ylabel={Cross-entropy loss},
+ xmin=1,xmax=12,xtick={1,4,8,12},grid=major,legend pos=north east]
+\addplot[blue,thick,mark=*] table[x=epoch,y=train_loss,col sep=comma]{reports/evidence/translation_clean_loss.csv};
+\addlegendentry{Train}
+\addplot[red,thick,mark=square*] table[x=epoch,y=validation_loss,col sep=comma]{reports/evidence/translation_clean_loss.csv};
+\addlegendentry{Validation}
+\end{axis}
+\end{tikzpicture}
+\caption{语言筛查与分组去重版的 12 轮 loss；来自新运行 history.json。}
+\end{figure}
 
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.16\textwidth}YYY}
-\toprule
-样本 & 源文 & 参考译文 & 模型译文 \\
-\midrule
-1 & \todo{粘贴实际源文} & \todo{粘贴实际参考译文} & \todo{粘贴实际模型输出} \\
-2 & \todo{粘贴实际源文} & \todo{粘贴实际参考译文} & \todo{粘贴实际模型输出} \\
-3 & \todo{粘贴实际源文} & \todo{粘贴实际参考译文} & \todo{粘贴实际模型输出} \\
-\bottomrule
-\end{tabularx}
+准备文件同时保存固定随机的语料复核候选；新测试前 10 条译文作为系统抽样候选存入结果 JSON，未宣称已由组员核验。第 6 条预测含重复的“dette dette”，第 8 条将源文年份 1618 生成为 16818，提示仍需检查重复与数字忠实度；这些是定位实例而非全体错误频率。当前 tokenizer 下新测试有 7 条 source、25 条 target 会触及既定截断规则，完整参考译文仍保留，没有事后删除。近重复、书籍邻近句和语义错配仍是限制。
 
-针对案例分析词义选择、漏译、增译、语序、长句、专名或其他观察到的问题，并说明可能原因。没有证据支持的原因应表述为假设，而不是确定结论。
+\subsubsection{翻译案例与数据质量风险}
+测试预测第 5 条（JSONL 从 1 起计数）的句子比较如下，保留原始输出及其标点：
+\begin{quote}\small
+源句：\texttt{"No, you want to beat me.}\\
+参考：—Non, tu veux me battre.\\
+预测：-- Non, vous voulez me battre.
+\end{quote}
+核心动作可辨，\texttt{tu/vous} 称谓不同可能影响语境和词面匹配，单凭该句不足以判定称谓必然错误。另两条短例显示了不同问题：
+\begin{quote}\small
+第 11 条源句：CHAPTER V--BUCK TREGELLIS\\
+参考：V -- LE BEAU TREGELLIS\\
+预测：VOIIIIIT PRETIÈRE\\[0.4em]
+第 29 条源句：\texttt{"This way, this way, children.}\\
+参考：--Par ici, par ici, les enfants.\\
+预测：-- Voilà, en route, enfants.
+\end{quote}
+前一例没有保留人名 TREGELLIS，后一例未保留两次“this way”的重复表达。这些只是定位后的实例，未对全测试集人工统计错误类别频率。
+
+更重要的是，测试预测第 2 条源句“Et cependant d’ou provenait ce sang…”为法语，而参考句“But, on the other hand, whose blood…”为英语；第 14 条源句询问 Fix 的目的，参考句却描述“奇怪的一致”，疑似句对不匹配。使用记录中的 revision、seed 和切分参数从本地缓存重新加载后，全部 6,355 对测试源句及参考句与预测 JSONL 逐条一致。这排除了本次核查范围内的导出错序，但不等于完成语言识别或全语料语义对齐审计。数据加载程序只按 \texttt{en}/\texttt{fr} 字段取值。因此 13.78 是当前含反向语向记录的测试输出得分，不能据此概括为经过审计的纯英译法表现。原始运行当时未统计异常比例，也未删除异常后重新计分；本轮新结果来自另行准备和重训的版本。
+
+固定随机句对切分还可能让同一本书的近邻句子出现在不同集合中；原始运行并非按书籍隔离的泛化实验。本轮分组仅消除了规范化后的精确重复，不能排除近重复或保证语义完全对齐。仅删除测试集中难译句或错配句以抬高分数会改变评价对象，本轮没有采取这种操作。
 
 \subsection{命名实体识别结果与分析}
 
-\subsubsection{实体级指标}
-至少报告总体实体级 Precision、Recall 和 F1，并写明汇总口径。若有多个实体类别，可同时报告分类别结果。
+\subsubsection{开发集实体级指标}
+保存的 \texttt{bert-base-chinese} 训练记录为 3 轮、种子 42，以带标签的 1,343 条 dev 选择最佳检查点（第 3 轮），并导出 1,343 条 dev 预测。用保存的 \path{dev_predictions.json}（完整目录见附录）按 seqeval 1.2.2、strict IOB2 和 micro 汇总独立复算：
 
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.24\textwidth}YYYY}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.29\textwidth}YYYY}
 \toprule
-类别 / 汇总口径 & Precision & Recall & F1 & 支持数 \\
+实体类别 & Precision & Recall & F1 & gold 支持数 \\
 \midrule
-\todo{实体类别 1} & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-\todo{实体类别 2} & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
-总体（\todo{micro / macro 等}） & \todo{填写} & \todo{填写} & \todo{填写} & \todo{填写} \\
+address & 60.05\% & 65.68\% & 62.74\% & 373 \\
+book & 83.89\% & 81.17\% & 82.51\% & 154 \\
+company & 76.88\% & 80.95\% & 78.87\% & 378 \\
+game & 78.40\% & 86.10\% & 82.07\% & 295 \\
+government & 76.95\% & 83.81\% & 80.23\% & 247 \\
+movie & 87.05\% & 80.13\% & 83.45\% & 151 \\
+name & 84.35\% & 89.25\% & 86.73\% & 465 \\
+organization & 78.34\% & 79.84\% & 79.08\% & 367 \\
+position & 79.77\% & 80.14\% & 79.95\% & 433 \\
+scene & 73.53\% & 71.77\% & 72.64\% & 209 \\
+\midrule
+micro（全部 10 类） & 77.16\% & 80.18\% & 78.64\% & 3,072 \\
 \bottomrule
 \end{tabularx}
 
-说明评估数据、评估脚本或库的版本、实体匹配规则及 \texttt{O} 标签处理方式。数值应可由保存的预测结果独立复算。
+完整分类别结果显示 name 的 F1 为 86.73\%，address 为 62.74\%；类别差异并不能由支持数单独解释，需结合边界与上下文。\texttt{O} 不作为实体计入，边界和类别都一致才算正确。dev 同时用于选检查点和报告得分，因而不是独立测试集结果；本地官方 test 无 gold 标签，不能报告其 P/R/F1。当前结果也没有与其他模型做严格对照。
 
-\subsubsection{错误分析}
-结合实际预测分析边界错误、类别混淆、未登录实体或 subword 对齐问题。可选取脱敏且可公开的样例；指出真实标签、预测标签、错误类型及可能原因。
-
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.18\textwidth}YYY}
+\subsubsection{训练与模型选择}
+\noindent\begin{tabularx}{\textwidth}{YYYY}
 \toprule
-文本片段 & 真实实体 / 标签 & 预测实体 / 标签 & 错误类型与分析 \\
+轮次 & dev loss & dev F1 & 步数 \\
 \midrule
-\todo{填写实际例子} & \todo{填写} & \todo{填写} & \todo{填写} \\
-\todo{填写实际例子} & \todo{填写} & \todo{填写} & \todo{填写} \\
+1 & 0.21116 & 76.70\% & 672 \\
+2 & 0.19263 & 78.01\% & 1,344 \\
+3 & 0.20916 & 78.64\% & 2,016 \\
 \bottomrule
 \end{tabularx}
+
+日志显示第 2 轮的 dev loss 最低，第 3 轮的实体级 F1 最高。代码以 F1 选择检查点，故保存的是第 3 轮模型，而不是 loss 最低模型。这反映 token 级训练损失与实体边界、类别的联合评价并不等价，不能凭 loss 一项判断实体识别效果。三轮均观察同一 dev，因此该结果用于模型选择，不能报告为未见测试集泛化能力。
+
+\subsubsection{可核查的错误案例与局限}
+按 dev 文件原始顺序的第 5 条（索引 4）含“雪山”与“牛奶海”。保存的 BIO gold 将两者都标为 \texttt{scene}，模型只识别了“牛奶海”，遗漏“雪山”；这个例子说明至少存在实体漏检，但不能据一例推断其总体成因。训练摘要还记录扁平 BIO 转换忽略了 2 个重叠实体跨度；对于这类嵌套标注，当前任务定义无法同时保留内外层。组员仍需人工检查更多边界和类别混淆案例，并确认索引、子词还原和标注约定后补充解释；不要把 dev 的错误类型推广为无标签 test 上的观察。
+
+另一个实例是 dev 第 2 条（索引 1）：“温格的球队终于又踢了一场经典的比赛，2比1战胜曼联之后枪手仍然留在了夺冠集团之内，”。gold 包含人名“温格”和组织“曼联”，模型额外将“枪手”标为 organization，按该标注属于误报；它是否符合更宽泛的实体定义需要另行讨论，不能更改本实验 gold 来使预测通过。上述两例均按保存的 tokenizer 将有效首子词位置映射回原文后核对，分别体现漏检和额外预测。
+
+\subsubsection{实体错误与训练中未见实体诊断}
+保存的 tokenizer 回查全部 dev，gold 标签逐项一致，没有字符因当前分词或截断失去监督位置，train/dev 原始文本精确交集为 0。用 seqeval strict IOB2 提取跨度后得到 TP=2,463、FN=609、FP=729，与总体指标一致。每个未匹配实体按以下优先规则归一类；FN 与 FP 各自分类，不代表错误实体之间存在一对一对应。
+
+\noindent\begin{tabularx}{\textwidth}{Yrr}
+\toprule
+存在性分类规则 & FN & FP \\
+\midrule
+边界相同、类别不同 & 152 & 152 \\
+类别相同、边界不同且重叠 & 257 & 267 \\
+边界和类别均不同且有重叠 & 51 & 60 \\
+无任何重叠实体 & 149 & 250 \\
+\bottomrule
+\end{tabularx}
+
+按实体原文及类别的组合是否在 train 的扁平 BIO 实体中出现分组，seen/unseen 的 gold 支持数为 1,908/1,164，对应 Precision 为 86.02\%/63.20\%、Recall 为 88.05\%/67.27\%、F1 为 87.02\%/65.17\%。这里的 unseen 不指 tokenizer OOV，也不说明预训练语料中未见；这是同一选模 dev 的诊断，不能作为因果或独立泛化结论。完整类别混淆、输入哈希及固定 seed 的自动错误候选见 \path{reports/evidence/ner_analysis.json}，解释仍须学生复核。
 
 \subsection{LoRA 数学微调结果与分析}
 
 \subsubsection{测试集准确率与基线比较}
-只报告独立测试集上的结果，并注明测试样本数。若实验中没有运行某个基线，应如实说明，不得补造对比值。
+使用同一基础模型、prompt、贪心解码和答案判定规则，对官方 test 的 1,319 道题逐题生成并保存原始输出。严格 Accuracy 的分母包含无法抽取最终答案的样本；“格式可抽取”仅指按当前规则找到 \texttt{\#\#\#\#} 或 \texttt{\textbackslash boxed\{...\}} 答案，不保证答案正确或格式完全合规。
 
-\noindent\begin{tabularx}{\textwidth}{YYYY}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.24\textwidth}YYYY}
 \toprule
-方法 & 正确数 / 测试总数 & Accuracy & 备注 \\
+方法 & 正确数 / 总数 & Accuracy & 可抽取数 / 比例 & 不匹配 / 抽取失败 \\
 \midrule
-\todo{未微调基线或其他基线} & \todo{填写} & \todo{填写} & \todo{模型和解码设置} \\
-LoRA 微调模型 & \todo{填写} & \todo{填写} & \todo{对应检查点或配置} \\
+未微调 Qwen 基线 & 482 / 1,319 & 36.54\% & 685 / 51.93\% & 203 / 634 \\
+LoRA，$\mathrm{lr}=2\times10^{-4}$ & 654 / 1,319 & 49.58\% & 1,314 / 99.62\% & 660 / 5 \\
 \bottomrule
 \end{tabularx}
 
-解释基线和微调模型的差异时，结合实际样本与训练设置讨论。说明数据量、模型能力、提示模板、生成随机性及判分规则可能造成的影响；避免仅凭一个指标作过度结论。
+本节预测与指标均位于 \path{lora_math_finetuning/outputs/}。
 
-\subsubsection{答案判定案例与错误分析}
-展示若干实际测试样本的题目、模型答案、抽取答案、标准答案和判分结果。分析算术错误、推理错误、格式错误或答案抽取失败等观察到的情况。
+当前评分版本为 \path{numeric-v2-leading-decimal}，从原始生成文本复算，汇总见 \path{baseline_test.metrics.v2.json} 和 \path{lora_test.metrics.v2.json}。旧版错误地移除了前导小数点，使题号 493 的 \texttt{.25} 与参考 \texttt{25} 相等；修正后 LoRA 从 655 题校正为 654 题，旧文件保持不变。当前完整测试 Accuracy 差为 13.04 个百分点，基线/LoRA 抽取失败数为 634/5；各自可抽取子集正确率为 70.36\%/49.77\%，子集不同，不能直接比较推理能力。学习率对照的四份验证分数未因修复改变；已查看过的 test 仍按探索性结果解释。
+
+按相同题号配对，307 题两者都正确、175 题仅基线正确、347 题仅 LoRA 正确、490 题两者均未判对，净增加 $347-175=172$ 题。“未判对”包含抽取失败，不能将这些变化直接解释为数学推理改善。
+
+\subsubsection{抽取协议敏感性}
+采用固定版本 lm-evaluation-harness GSM8K 的 flexible-extract 正则取最后一个匹配，并沿用项目数值比较器，对同一批已保存输出作事后诊断\cite{gsm8k_eval}：
+
+\noindent\begin{tabularx}{\textwidth}{YYY}
+\toprule
+v2 口径 & 未微调基线 & LoRA \\
+\midrule
+严格标记及 boxed 回退 & 36.54\%（482/1,319） & 49.58\%（654/1,319） \\
+最后数字抽取诊断 & 64.97\%（857/1,319） & 49.66\%（655/1,319） \\
+\bottomrule
+\end{tabularx}
+
+第二行没有重跑上游 5-shot prompt、停止条件和完整 exact-match 流程，不是官方 harness 成绩，也不是无偏的纯推理测量。基线有 408 题从严格错变成诊断对，也有 33 题反向变化；LoRA 有 1 题从严格错变成诊断对。固定 seed 的 11 条分歧候选保存在 \path{reports/evidence/lora_disagreements.jsonl}，包括两个方向，未宣称学生已人工核验。例如基线题号 264 的 boxed 答案 400 被严格规则正确抽取，最后匹配正则却取到结尾的 \texttt{\$.}；这说明宽松规则也有误判。模型优劣顺序随协议改变，不能据严格分数单独证明推理能力提升，亦不能由诊断差值精确量化真实能力下降。
+
+\subsubsection{验证集学习率对照}
+固定 GSM8K 划分、prompt、种子 42、$r=8$、$\alpha=16$、dropout=0.05、目标层 \texttt{q\_proj/v\_proj} 和 1 个 epoch（各 421 步），在同一 748 题验证集上比较已有 $2\times10^{-4}$ adapter 和两个新训练的学习率配置。三组 LoRA 仅改变学习率与输出目录，使用同一贪心生成和判分规则；未微调基线作为参照。验证集 loss 是训练器计算的监督续写损失，不等同于生成答案 Accuracy。
 
 \noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.23\textwidth}YYYY}
 \toprule
-题目 / 样本编号 & 模型输出 & 抽取答案 / 标准答案 & 判定及错误分析 \\
+设置 & 正确数 / 总数 & Accuracy & 格式可抽取率 & 验证 loss \\
 \midrule
-\todo{填写实际例子} & \todo{节选真实输出} & \todo{填写} & \todo{正确 / 错误及原因} \\
-\todo{填写实际例子} & \todo{节选真实输出} & \todo{填写} & \todo{正确 / 错误及原因} \\
+未微调基线 & 289 / 748 & 38.64\% & 51.74\% & 未计算 \\
+LoRA，$\mathrm{lr}=2\times10^{-4}$ & 460 / 748 & 61.50\% & 99.87\% & 0.33051 \\
+LoRA，$\mathrm{lr}=1\times10^{-4}$ & 467 / 748 & 62.43\% & 99.47\% & 0.33697 \\
+LoRA，$\mathrm{lr}=5\times10^{-5}$ & 453 / 748 & 60.56\% & 98.80\% & 0.34580 \\
 \bottomrule
 \end{tabularx}
+
+验证集原始预测、指标和错误样本均保存在前述输出目录下。基线与原始 LoRA 分别见 \path{sweep-baseline/}、\path{sweep-lr2e-4/}。
+
+两个新配置分别见 \path{sweep-lr1e-4/}、\path{sweep-lr5e-5/}。验证 loss 位于相应训练目录的 \path{checkpoint-421/trainer_state.json}；已有 $2\times10^{-4}$ 的训练目录为 \path{qwen2.5-1.5b-gsm8k/}，而非仅保存验证预测的 \path{sweep-lr2e-4/}。以验证集严格 Accuracy 为选择准则，$1\times10^{-4}$ 本次比 $2\times10^{-4}$ 多答对 7/748 题（约 0.94 个百分点），但只跑了一个种子，不能宣称稳定更优。较低的验证 loss 与较高的生成 Accuracy 不必对应同一配置。这轮没有扫 rank、alpha、dropout 或目标模块，也没有对新 adapter 再运行官方 test。
+
+本次不继续做多维网格搜索。若后续有算力和独立验证需求，可先用另一个随机种子重复 $1\times10^{-4}$ 与 $2\times10^{-4}$，比较波动；若需要研究 LoRA 容量，再固定学习率分别试验不同 $r$，其他设置保持不变。这些是待执行方案，不是本报告已取得的结果。反复用同一验证集筛选也会增加对验证集过拟合的风险。
+
+\subsubsection{答案判定案例与错误分析}
+官方 test 的 \texttt{question\_id=1} 问题是：一件衣服需 2 捆蓝色纤维，白色为蓝色的一半，合计多少捆？标准答案为 3。保存的基线输出逐步算得蓝色 2、白色 1，并以 \texttt{**3**} 结尾；但没有约定的最终答案标记，当前抽取器返回空并判为 \texttt{extraction\_failed}。同题 LoRA 输出以 \texttt{\#\#\#\# 5} 结尾，可抽取但判错：它把蓝色用量误算成 $2\times2=4$，最后得到 5。这个案例来自两份原始预测文件，说明格式遵从和解题正确是两个不同维度，而不是自动判定所有未抽取样本都不会做题。
+
+官方 test 的题号 0 提供另一类错误：鸭子每天产 16 个蛋，食用 3 个、做点心用 4 个，其余每个卖 2 美元，参考答案是 $(16-3-4)\times2=18$。基线正确，LoRA 却首先输出 \texttt{16*3=<<16*3=48>>48}，最终 \texttt{\#\#\#\# 82}。乘法运算本身无误，错误在于将“吃 3 个”当成产蛋量的乘数，属于题意到算式的对应错误。该例与纤维题都不支持将所有答案不匹配简单归因为算术能力不足。
+
+\texttt{answer\_mismatch} 仅表示抽取后与参考不等，\texttt{extraction\_failed} 仅表示未抽出约定标记，不能自动区分算术、题意理解、生成截断或解析局限。当前 LoRA 错误请查看 \path{lora_test.errors.v2.jsonl}，原始 \path{lora_test.errors.jsonl} 属于旧评分；基线错误文件不受该修复影响。组员应核对自动候选与原始输出，不修改生成文本或仅保留较好判分结果。
+
+补充 adapter 文件审计通过 safetensors 头部读取形状，核对 28 层 q/v 模块、rank=8、112 个张量及 1,089,536 个参数，均与已保存的参数名和统计一致；来源哈希及形状在 \path{reports/evidence/adapter_audit.json}。此检查核实保存内容，不能单独证明历史优化器或冻结行为，仍应结合 PEFT 实现解释。
 
 \subsection{运行验证与结果可追溯性}
-记录实际完成的格式检查、静态检查、关键逻辑测试、smoke test 和正式训练。明确哪些步骤尚未执行及原因；不要把未运行的步骤写成通过。
+本轮在用户授权后完成翻译数据准备、两步 smoke、12 轮正式重训、完整测试和独立复算；NER 与 LoRA 只分析已有预测，没有新增训练或用 test 继续选参。原始 13 个证据输入哈希未变，LoRA 旧评分保留在历史文件及 \path{results.v1.json} 中，当前结果显式记录 v2 修复及唯一改变判定的题号。\path{reports/verify_results.py} 生成新旧翻译曲线和当前汇总，检查完整测试与固定准备文件逐条对应。
 
-\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.27\textwidth}YY}
+\noindent\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.28\textwidth}Y}
 \toprule
-检查项目 & 实际命令 / 路径 & 结果与证据位置 \\
+核查项 & 本轮实际结果及范围 \\
 \midrule
-代码格式与静态检查 & \todo{填写实际命令} & \todo{填写通过、失败或未执行及日志位置} \\
-关键逻辑单元测试 & \todo{填写实际命令} & \todo{填写结果及日志位置} \\
-Smoke test & \todo{填写数据规模及实际命令} & \todo{填写结果；不得当作正式结果} \\
-正式训练与最终评估 & \todo{填写实际命令} & \todo{填写配置、日志、预测文件和检查点路径} \\
-指标独立复算 & \todo{填写评估命令} & \todo{填写结果文件及复算结果} \\
+指标复算 & 新旧翻译 BLEU、NER strict 实体指标、六份 LoRA v2 指标一致；旧 v1 差异显式记录 \\
+单元测试 & 翻译 26、NER 9、LoRA 30、空闲卡选择器 5，共 70 项通过；屏蔽 CUDA \\
+静态与格式 & 三个实验、选择器、测试和复算脚本静态检查通过；变更 Python 文件格式检查通过 \\
+数据重建 & 新版本 manifest、三份切分、排除记录和抽样共六个文件重建哈希一致；精确跨集合重复为 0 \\
+GPU 任务 & 两次状态检查及计算进程排除后启动；四个任务均正常退出，未停止其他用户进程 \\
+证据限制 & 自动语言筛查与错误抽样未取代学生核验；NER 仍为选模 dev；LoRA 新学习率未测 test \\
 \bottomrule
 \end{tabularx}
 
-\section{总结}
-从任务结构和方法原理看，机器翻译、命名实体识别和数学题参数高效微调分别对应条件序列生成、实体序列标注和生成模型适配；相应评价应使用与任务输出相匹配的 BLEU、实体级 Precision/Recall/F1 和答案准确率。Transformer、BERT 和 LoRA 为本课程任务提供了代表性建模路线，但方法背景本身不能证明具体实验有效。
+PyTorch 嵌套张量接口仍提示原型状态，未造成测试失败。选择器的用户锁不是集群排他调度，不能保证其他用户不在启动后使用同一卡。训练模型、准备数据、原始预测和日志被 Git 忽略，须另行备份；小型 JSON、CSV 与源码可追溯，但不能替代原始产物。
 
-本节目前仅总结任务与文献层面的认识，不包含本组实验发现。完成数据准备和实际运行后，应补充三项实验是否达到目标、基线比较、典型错误、资源限制及结论；未运行或无法复核的内容不得写成实验结果。
+\section{总结}
+\subsection{主要观察}
+三个实验均保留了模型、配置、日志与可独立复算的预测，但它们的评价对象不同，指标不能横向排名。翻译语言筛查与分组去重版完成 12 轮训练，测试 BLEU 为 13.69，精确跨集合重复已排除；与原始 13.78 使用不同评价集合，不能按差值推断模型改进。BERT 开发集实体 F1 为 78.64\%，错误分解和 seen/unseen 诊断提供更细的描述，但不改变 dev 参与选模的事实。
+
+LoRA 保存的低秩参数仅占含 adapter 模型约 0.0705\%，修复前导小数点误判后严格测试准确率为基线 36.54\%、LoRA 49.58\%；另一抽取诊断改变优劣顺序，说明格式和解析对结论有重要影响，不能单独证明推理能力提升。学习率 $10^{-4}$ 的验证准确率为 62.43\%，只比 $2\times10^{-4}$ 多 7 题，单 seed 不足以证明稳定优势。本轮没有为获得正向结果而继续用 test 搜索配置。
+
+\subsection{局限与后续工作}
+语言识别不是语义对齐，精确去重不是近重复或按书籍隔离；已保存的清洗与错误候选仍须组员核验。NER 独立有标签评测、多随机种子及进一步 LoRA 训练不在本轮范围。若以后重复 LoRA 的训练 seed，应先将切分 seed 与优化随机性分开，以免同时改变验证集。测试集已用于案例诊断的事实应持续披露。
+
+本文同步了已执行的技术记录，不代表组员已理解全部实现或完成最终分析。最终提交前，应由三位组员阅读和运行必要检查、解释方法与指标、按实际理解修订误差分析，补齐个人信息、真实贡献、许可核查和 AI 使用披露。不得把自动候选实例或未执行的扩展方案写成已人工验证的实验结论。
 
 \section{组员分工}
 
@@ -395,37 +713,97 @@ Smoke test & \todo{填写数据规模及实际命令} & \todo{填写结果；不
 
 \section*{工具与 AI 使用披露}
 \addcontentsline{toc}{section}{工具与 AI 使用披露}
-本报告框架及当前已撰写的摘要、第一章、第二章和总结由生成式 AI 协助整理和起草。组员须核对文献原文与书目信息，检查并修订生成内容，对最终提交的文本、引用和实验结论负责；其他 AI 使用情况及披露格式按课程和学校规定如实补充。
+本文的框架、概念整理、局部实现与调试、指标复算、图表及部分分析文字使用了生成式 AI 辅助。本轮翻译清洗、smoke、正式重训和测试生成，以及此前的 LoRA 学习率训练与验证生成，由 AI 助手在用户授权后调用本地工具执行；NER 与 LoRA 补充审计读取已有产物。这不等同于组员已独立完成全部实验或理解实现。其他历史产物的人员贡献仍待确认。组员应核查来源、预测、引用和分析，以自己的理解修订最终稿，并按学校与课程要求披露工具使用。
 
 \addcontentsline{toc}{section}{参考文献}
 \begin{thebibliography}{99}
-\item[] {\footnotesize 本文引用条目依据课程学习材料中的原始论文线索整理。当前环境无法连接外部文献站点，提交前请逐条对照论文原文或官方记录核验作者、出版信息、页码和链接；未核验的条目不要作为最终引用保留。}
+\item[] {\footnotesize 下列条目按各出版方 / 论文仓库的书目记录整理，并抽查了本地开放 PDF 的首页题名。下载文件索引见 reports/README.md；数据集页面、模型卡及许可证属于实验资料来源，和学术论文分别引用。正式提交前仍应由组员核对引用格式及学校要求。}
 
-\bibitem{seq2seq} I. Sutskever, O. Vinyals, and Q. V. Le, ``Sequence to Sequence Learning with Neural Networks,'' in \textit{Advances in Neural Information Processing Systems 27}, 2014. Available: \url{https://arxiv.org/abs/1409.3215}.
+\bibitem{seq2seq} I. Sutskever, O. Vinyals, and Q. V. Le, ``Sequence to Sequence Learning with Neural Networks,'' in \textit{Advances in Neural Information Processing Systems 27}, pp. 3104--3112, 2014. Available: \url{https://arxiv.org/abs/1409.3215}.
 
-\bibitem{transformer} A. Vaswani et al., ``Attention Is All You Need,'' in \textit{Advances in Neural Information Processing Systems 30}, 2017. Available: \url{https://arxiv.org/abs/1706.03762}.
+\bibitem{bahdanau} D. Bahdanau, K. Cho, and Y. Bengio, ``Neural Machine Translation by Jointly Learning to Align and Translate,'' in \textit{International Conference on Learning Representations}, 2015. Available: \url{https://arxiv.org/abs/1409.0473}.
+
+\bibitem{transformer} A. Vaswani et al., ``Attention Is All You Need,'' in \textit{Advances in Neural Information Processing Systems 30}, pp. 5998--6008, 2017. Available: \url{https://arxiv.org/abs/1706.03762}.
+
+\bibitem{opus} J. Tiedemann, ``Parallel Data, Tools and Interfaces in OPUS,'' in \textit{Proceedings of the Eighth International Conference on Language Resources and Evaluation (LREC 2012)}, pp. 2214--2218, 2012. Available: \url{https://aclanthology.org/L12-1246/}.
+
+\bibitem{sentencepiece} T. Kudo and J. Richardson, ``SentencePiece: A Simple and Language Independent Subword Tokenizer and Detokenizer for Neural Text Processing,'' in \textit{Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing: System Demonstrations}, pp. 66--71, 2018. doi: 10.18653/v1/D18-2012. Available: \url{https://aclanthology.org/D18-2012/}.
 
 \bibitem{bleu} K. Papineni, S. Roukos, T. Ward, and W.-J. Zhu, ``BLEU: a Method for Automatic Evaluation of Machine Translation,'' in \textit{Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics}, pp. 311--318, 2002. doi: 10.3115/1073083.1073135. Available: \url{https://aclanthology.org/P02-1040/}.
 
+\bibitem{post} M. Post, ``A Call for Clarity in Reporting BLEU Scores,'' in \textit{Proceedings of the Third Conference on Machine Translation: Research Papers}, pp. 186--191, 2018. doi: 10.18653/v1/W18-6319. Available: \url{https://aclanthology.org/W18-6319/}.
+
+\bibitem{lample} G. Lample, M. Ballesteros, S. Subramanian, K. Kawakami, and C. Dyer, ``Neural Architectures for Named Entity Recognition,'' in \textit{Proceedings of NAACL-HLT 2016}, pp. 260--270, 2016. doi: 10.18653/v1/N16-1030. Available: \url{https://aclanthology.org/N16-1030/}.
+
+\bibitem{mah_hovy} X. Ma and E. Hovy, ``End-to-end Sequence Labeling via Bi-directional LSTM-CNNs-CRF,'' in \textit{Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics}, pp. 1064--1074, 2016. doi: 10.18653/v1/P16-1101. Available: \url{https://aclanthology.org/P16-1101/}.
+
 \bibitem{bert} J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, ``BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding,'' in \textit{Proceedings of NAACL-HLT 2019}, pp. 4171--4186, 2019. doi: 10.18653/v1/N19-1423. Available: \url{https://aclanthology.org/N19-1423/}.
 
-\bibitem{instructgpt} L. Ouyang et al., ``Training Language Models to Follow Instructions with Human Feedback,'' in \textit{Advances in Neural Information Processing Systems 35}, pp. 27730--27744, 2022. Available: \url{https://arxiv.org/abs/2203.02155}.
+\bibitem{clue} L. Xu et al., ``CLUE: A Chinese Language Understanding Evaluation Benchmark,'' arXiv:2004.05986, 2020. Available: \url{https://arxiv.org/abs/2004.05986}.
 
-\bibitem{lora} E. J. Hu et al., ``LoRA: Low-Rank Adaptation of Large Language Models,'' in \textit{International Conference on Learning Representations (ICLR)}, 2022. Available: \url{https://arxiv.org/abs/2106.09685}.
+\bibitem{cluener2020} L. Xu et al., ``CLUENER2020: Fine-grained Named Entity Recognition Dataset and Benchmark for Chinese,'' arXiv:2001.04351, 2020. Available: \url{https://arxiv.org/abs/2001.04351}.
+
+\bibitem{ner_survey} D. Nadeau and S. Sekine, ``A Survey of Named Entity Recognition and Classification,'' \textit{Lingvisticae Investigationes}, vol. 30, no. 1, pp. 3--26, 2007. doi: 10.1075/li.30.1.03nad.
+
+\bibitem{gsm8k} K. Cobbe et al., ``Training Verifiers to Solve Math Word Problems,'' arXiv:2110.14168, 2021. Available: \url{https://arxiv.org/abs/2110.14168}.
+
+\bibitem{cot} J. Wei et al., ``Chain-of-Thought Prompting Elicits Reasoning in Large Language Models,'' in \textit{Advances in Neural Information Processing Systems 35}, pp. 24824--24837, 2022. Available: \url{https://arxiv.org/abs/2201.11903}.
+
+\bibitem{lora} E. J. Hu et al., ``LoRA: Low-Rank Adaptation of Large Language Models,'' in \textit{International Conference on Learning Representations}, 2022. Available: \url{https://arxiv.org/abs/2106.09685}.
 
 \bibitem{qlora} T. Dettmers et al., ``QLoRA: Efficient Finetuning of Quantized LLMs,'' in \textit{Advances in Neural Information Processing Systems 36}, 2023. Available: \url{https://arxiv.org/abs/2305.14314}.
+
+\bibitem{qwen} Qwen Team, ``Qwen2.5 Technical Report,'' arXiv:2412.15115, 2025. Available: \url{https://arxiv.org/abs/2412.15115}.
+
+\bibitem{opusbooks} Helsinki-NLP, ``OPUS Books Dataset,'' Hugging Face Datasets. Available: \url{https://huggingface.co/datasets/Helsinki-NLP/opus_books}.
+
+\bibitem{cluener_data} CLUEbenchmark, ``CLUENER 2020 Dataset,'' official GitHub repository. Available: \url{https://github.com/CLUEbenchmark/CLUENER}.
+
+\bibitem{gsm8k_data} OpenAI, ``GSM8K: Grade School Math 8K Dataset,'' Hugging Face Datasets. Available: \url{https://huggingface.co/datasets/openai/gsm8k}.
+
+\bibitem{fasttext_lid} fastText, ``Language identification,'' official model documentation. Available: \url{https://fasttext.cc/docs/en/language-identification.html}. Model license: CC-BY-SA-3.0.
+
+\bibitem{gsm8k_eval} EleutherAI, ``GSM8K task configuration,'' lm-evaluation-harness, fixed commit \path{d6de81643928d653435c431bae19945d41d32520}. Available: \url{https://github.com/EleutherAI/lm-evaluation-harness/blob/d6de81643928d653435c431bae19945d41d32520/lm_eval/tasks/gsm8k/gsm8k.yaml}.
+
+\bibitem{instructgpt} L. Ouyang et al., ``Training Language Models to Follow Instructions with Human Feedback,'' in \textit{Advances in Neural Information Processing Systems 35}, pp. 27730--27744, 2022. Available: \url{https://arxiv.org/abs/2203.02155}.
 \end{thebibliography}
 
 \appendix
 \section{复现实验信息}
-填写可帮助他人复现实验的命令、配置和产物位置。注意不要在报告中暴露访问令牌、私有凭据或受许可限制的数据。
+复现分为两层：从保存预测重新计算指标无需重新训练；从数据重建模型则还需同一依赖版本、数据版本和运行配置。下列命令仅供复现，正文明确区分本次已执行的检查和未重新执行的训练。
 
 \begin{itemize}
-  \item 项目代码版本 / Git commit：\todo{填写}
-  \item 机器翻译配置、训练日志、预测文件：\todo{填写路径}
-  \item NER 配置、训练日志、预测文件：\todo{填写路径}
-  \item LoRA 配置、训练日志、测试预测文件、适配器：\todo{填写路径}
-  \item 运行命令与评估命令：\todo{填写或指向仓库文档}
+  \item 整理时仓库 HEAD：\path{f88175f0057fdee5ddaeb2b48d9cd5c2d198abd7}。工作区仍有未提交修改，不能只靠该提交号复现；新翻译运行另存 \path{code_snapshot.json}，历史训练未补造代码快照。
+  \item 旧翻译产物保留在 \path{machine_translation/outputs/en-fr-full-seed42/}；新准备数据在 \path{machine_translation/outputs/en-fr-clean-data-v1/}，新模型、日志与完整测试预测在 \path{machine_translation/outputs/en-fr-clean-v1-seed42/}。
+  \item NER 产物位于 \path{bert_ner/outputs/bert-base-chinese/}：保存的模型、dev 预测、结果摘要及环境信息；test 不提供 gold 标签。
+  \item LoRA 配置与产物位于 \path{lora_math_finetuning/}：原始配置 \path{config.json}、两份学习率配置 \path{configs/sweep_lr1e-4.json} 和 \path{configs/sweep_lr5e-5.json}；训练日志、adapter、预测与指标见 \path{outputs/} 及 \path{README.md}。
+  \item 报告复算证据：\path{reports/evidence/results.json}；曲线数据：\path{reports/evidence/translation_loss.csv}。这些小文件保存数值与源文件哈希；原始大文件及权重未加入 Git。
 \end{itemize}
+
+\subsection{数据及模型版本}
+OPUS Books revision：\path{1f9f6191d0e91a3c539c2595e2fe48fc1420de9b}；GSM8K revision：\path{740312add88f781978c0658806c59bc2815b9866}；Qwen revision：\path{989aa7980e4cf806f80c7fef2b1adb7bc71aa306}。BERT 配置仅记录 \texttt{bert-base-chinese}，未固定 Hub revision，是精确复现的限制。数据来源与许可按第三章说明，模型许可需对所用版本模型卡进一步核对。
+
+\subsection{指标与检查命令}
+从仓库根目录，激活已有环境（本机为 \path{/home/yifeiwang/project/.venv}），仅复算已保存的预测：
+\begin{Verbatim}[fontsize=\small,breaklines=true]
+source /home/yifeiwang/project/.venv/bin/activate
+CUDA_VISIBLE_DEVICES='' python reports/verify_results.py --audit-cached-mt --clean-mt-run machine_translation/outputs/en-fr-clean-v1-seed42
+CUDA_VISIBLE_DEVICES='' PYTHONPATH=bert_ner python -m pytest -q machine_translation/tests bert_ner/tests lora_math_finetuning/tests tests
+CUDA_VISIBLE_DEVICES='' python bert_ner/analyze.py --output reports/evidence/ner_analysis.json
+CUDA_VISIBLE_DEVICES='' python -m lora_math_finetuning.analyze_scoring --baseline lora_math_finetuning/outputs/baseline_test.jsonl --lora lora_math_finetuning/outputs/lora_test.jsonl --output reports/evidence/scoring_sensitivity.json --disagreements-output reports/evidence/lora_disagreements.jsonl
+ruff check machine_translation bert_ner lora_math_finetuning scripts tests reports/verify_results.py
+\end{Verbatim}
+上述检查本轮已通过。复算依赖本地预测、准备数据和实验依赖，若只克隆仓库而缺少被 Git 忽略的 outputs，须取得对应产物；复算脚本不会自动下载模型或执行训练。当前 LoRA 分数以 v2 文件为准，历史 v1 保留供追踪修复。
+
+\subsection{训练与生成入口}
+以下是重新训练入口，须选择未使用的输出目录。选择器两次检查空闲状态并记录物理 GPU，不固定使用某张卡；数据准备和完整命令见各实验 README：
+\begin{Verbatim}[fontsize=\small,breaklines=true]
+python scripts/run_on_idle_gpu.py --record machine_translation/outputs/reproduce.job.json --log machine_translation/outputs/reproduce.log -- python -m machine_translation.train --config machine_translation/configs/en_fr_clean.json --device cuda:0 --output-dir machine_translation/outputs/reproduce-clean
+python scripts/run_on_idle_gpu.py --record machine_translation/outputs/reproduce-test.job.json --log machine_translation/outputs/reproduce-test.log -- python -m machine_translation.evaluate --run-dir machine_translation/outputs/reproduce-clean --split test --batch-size 64 --device cuda:0
+\end{Verbatim}
+已有清洗配置固定了本机准备文件的 manifest 哈希；在新机器上先按 README 重建数据并生成新配置，不要绕过校验。NER 与 LoRA 的额外重训不在本轮范围，若实施须另选输出目录并保存方案；现有验证生成入口仍见对应 README。
+
+\subsection{报告构建与待确认信息}
+在仓库根目录运行构建脚本：\path{reports/build_report.sh}（使用 bash）。成功后自动同步 \texttt{reports/} 下的“实验报告模板.pdf”和 build 目录预览，避免打开旧版。最后需组员填写封面及分工表、确认提交日期、核对尚未确认的数据/模型许可，并根据实际理解修订分析。提交文件名按课程要求改为“26年秋实验报告\_第x组\_组长姓名\_组长学号”，不要用未填写模板作为最终稿。
 
 \end{document}

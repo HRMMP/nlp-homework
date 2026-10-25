@@ -1,0 +1,818 @@
+{
+  "lora_paired_test_decisions": {
+    "both_correct": 307,
+    "baseline_only": 175,
+    "lora_only": 347,
+    "both_wrong": 490
+  },
+  "scope": "Saved-prediction rescoring only; NER scores are dev scores used for selection.",
+  "source_sha256": {
+    "machine_translation/outputs/en-fr-full-seed42/predictions.test.jsonl": "820f206f907e9e78c866d7f50a15a07ba95d0b247d1e97ad7bd8770a5f8b405f",
+    "machine_translation/outputs/en-fr-full-seed42/history.json": "0043b3da060da427000a9dfeceec17b7a10692330bf9a23f32fd9a56450ebbe9",
+    "bert_ner/outputs/bert-base-chinese/dev_predictions.json": "d4d1c0d67eaf98a739fd0c07adb813c67db7db353cc47cdc3392e2a39b11fe0b",
+    "bert_ner/outputs/bert-base-chinese/checkpoint-2016/trainer_state.json": "dff07785791e319678d54645bcdc7548e66ad693d4d1209a360a7eb60e12df91",
+    "lora_math_finetuning/outputs/baseline_test.jsonl": "af00481212a011e692807ab8c1ed72c96d6bb02a5d5b72e80df6913f67f17717",
+    "lora_math_finetuning/outputs/lora_test.jsonl": "80b022bba799eea1d6db2b05f773f9a24c9c40325d84fb9abaddaa5f24109408",
+    "lora_math_finetuning/outputs/sweep-baseline/validation.jsonl": "746fd187cc77f3a52799e2fed287c63573fd1dbfa01fd2bbeda1dbf00e52f184",
+    "lora_math_finetuning/outputs/sweep-lr2e-4/validation.jsonl": "c8763e8964ebd174dfc996facb10823975668dc2e5dbbf8c0b97135a57e0710e",
+    "lora_math_finetuning/outputs/sweep-lr1e-4/validation.jsonl": "75c7a33b3178bf16029b7c9cc0f5d24a2b5001b4222dcbe53b91e0c032bac41e",
+    "lora_math_finetuning/outputs/sweep-lr5e-5/validation.jsonl": "20c9a2534949753625bb0da9c1e7aeee9a4d29faa5ae2205e18fb080c9bba4ff",
+    "lora_math_finetuning/outputs/qwen2.5-1.5b-gsm8k/checkpoint-421/trainer_state.json": "83dba215278c53bfbc8e8d91813ccfb68fcfe84bca6cb0ef7a9cbc2a92ff78e7",
+    "lora_math_finetuning/outputs/sweep-lr1e-4/checkpoint-421/trainer_state.json": "8788450d69e56171d6bd633811ddb003d5887e8baf3d71ea773239f6b867d088",
+    "lora_math_finetuning/outputs/sweep-lr5e-5/checkpoint-421/trainer_state.json": "a7a4f63f284c06d14622f137ca7f27c183861e3015090460b9b25040b1f3ff3c",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/run_config.json": "817f6bc2d66011596cd8ce76e882392477daa855a874528474d6b709d89db4f1",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/data_manifest.json": "e2fc5f2a3dddcee2db339ac10f8b269d23c9b5ae5c4d62e71d792f1665224eb6",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/runtime.json": "36bef09a4e9b23425ffd3d8efa2d94a96ae7dbbebfc3908ad1559149eb2a8fca",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/code_snapshot.json": "ddf0737052f9a2c1d506b226960ebe3d7a5c6208104ef1b5c082a4b8aea3ed2c",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/best.pt": "a2c3e36c68f7b879375daa1f9a3263a894f7077fe2e383cb5f77c8c3727adef7",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/tokenizer.model": "556125e5fa985e7e027e23954009d684c3db3874fed44bf4b79f9a0a736bd21f",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/history.json": "a64fdb4e9bdb7dfe34b5630017e7aad8ac2835a6e22179e72dc702a828ef8894",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/predictions.test.jsonl": "417985cf0120de4c381359d91c6ec0ce86b288f7ebf6b95b4509d354e0fd95fa",
+    "machine_translation/outputs/en-fr-clean-v1-seed42/metrics.test.json": "21a80493d7b2c104041422dc2ad4dd44712292a79c158c1d0169421be3bb2cff"
+  },
+  "translation": {
+    "bleu": 13.777461323997372,
+    "bleu_1_to_4_precisions": [
+      47.34090048162779,
+      19.526848887098257,
+      9.507459152261426,
+      4.872748158554475
+    ],
+    "brevity_penalty": 0.9577285236349995,
+    "system_length": 147832,
+    "reference_length": 154217,
+    "num_examples": 6355,
+    "sacrebleu_signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+    "sacrebleu_configuration": {
+      "metric": "corpus BLEU",
+      "implementation": "SacreBLEU",
+      "reference_count": 1,
+      "max_ngram_order": 4,
+      "tokenizer": "13a",
+      "lowercase": false,
+      "smoothing": "exp",
+      "effective_order": false,
+      "brevity_penalty": "SacreBLEU default"
+    }
+  },
+  "translation_history": [
+    {
+      "epoch": 1,
+      "global_step": 1788,
+      "train_loss": 4.964517098154149,
+      "validation_loss": 4.287357522646918,
+      "seconds": 91.31420051120222
+    },
+    {
+      "epoch": 2,
+      "global_step": 3576,
+      "train_loss": 4.149658214596022,
+      "validation_loss": 3.8713683512452692,
+      "seconds": 90.95599964540452
+    },
+    {
+      "epoch": 3,
+      "global_step": 5364,
+      "train_loss": 3.849098425039558,
+      "validation_loss": 3.6241113975773156,
+      "seconds": 89.31052171625197
+    },
+    {
+      "epoch": 4,
+      "global_step": 7152,
+      "train_loss": 3.6384415025337327,
+      "validation_loss": 3.4205129903552565,
+      "seconds": 91.01572847180068
+    },
+    {
+      "epoch": 5,
+      "global_step": 8940,
+      "train_loss": 3.4283086212062543,
+      "validation_loss": 3.210826996126649,
+      "seconds": 91.22551700565964
+    },
+    {
+      "epoch": 6,
+      "global_step": 10728,
+      "train_loss": 3.213182068105574,
+      "validation_loss": 3.0147124835467345,
+      "seconds": 90.67047771904618
+    },
+    {
+      "epoch": 7,
+      "global_step": 12516,
+      "train_loss": 3.0310414559144374,
+      "validation_loss": 2.870759077084986,
+      "seconds": 91.14989835117012
+    },
+    {
+      "epoch": 8,
+      "global_step": 14304,
+      "train_loss": 2.8957432927088402,
+      "validation_loss": 2.801844576994855,
+      "seconds": 91.09073877241462
+    },
+    {
+      "epoch": 9,
+      "global_step": 16092,
+      "train_loss": 2.796780128827406,
+      "validation_loss": 2.698565786504997,
+      "seconds": 91.11157035082579
+    },
+    {
+      "epoch": 10,
+      "global_step": 17880,
+      "train_loss": 2.7192316350079087,
+      "validation_loss": 2.660698224887581,
+      "seconds": 90.83606607094407
+    },
+    {
+      "epoch": 11,
+      "global_step": 19668,
+      "train_loss": 2.6525215177838213,
+      "validation_loss": 2.5854146865154255,
+      "seconds": 90.71994952484965
+    },
+    {
+      "epoch": 12,
+      "global_step": 21456,
+      "train_loss": 2.5867713896929954,
+      "validation_loss": 2.5230457542328475,
+      "seconds": 90.40264360513538
+    }
+  ],
+  "ner_classification": {
+    "address": {
+      "precision": 0.6004901960784313,
+      "recall": 0.6568364611260054,
+      "f1-score": 0.6274007682458387,
+      "support": 373
+    },
+    "book": {
+      "precision": 0.8389261744966443,
+      "recall": 0.8116883116883117,
+      "f1-score": 0.8250825082508252,
+      "support": 154
+    },
+    "company": {
+      "precision": 0.7688442211055276,
+      "recall": 0.8095238095238095,
+      "f1-score": 0.7886597938144331,
+      "support": 378
+    },
+    "game": {
+      "precision": 0.7839506172839507,
+      "recall": 0.8610169491525423,
+      "f1-score": 0.8206785137318255,
+      "support": 295
+    },
+    "government": {
+      "precision": 0.7695167286245354,
+      "recall": 0.8380566801619433,
+      "f1-score": 0.8023255813953488,
+      "support": 247
+    },
+    "movie": {
+      "precision": 0.8705035971223022,
+      "recall": 0.8013245033112583,
+      "f1-score": 0.8344827586206897,
+      "support": 151
+    },
+    "name": {
+      "precision": 0.8434959349593496,
+      "recall": 0.8924731182795699,
+      "f1-score": 0.8672936259143156,
+      "support": 465
+    },
+    "organization": {
+      "precision": 0.7834224598930482,
+      "recall": 0.7983651226158038,
+      "f1-score": 0.7908232118758435,
+      "support": 367
+    },
+    "position": {
+      "precision": 0.7977011494252874,
+      "recall": 0.8013856812933026,
+      "f1-score": 0.7995391705069125,
+      "support": 433
+    },
+    "scene": {
+      "precision": 0.7352941176470589,
+      "recall": 0.7177033492822966,
+      "f1-score": 0.7263922518159807,
+      "support": 209
+    },
+    "micro avg": {
+      "precision": 0.7716165413533834,
+      "recall": 0.8017578125,
+      "f1-score": 0.7863984674329502,
+      "support": 3072
+    },
+    "macro avg": {
+      "precision": 0.7792145196636134,
+      "recall": 0.7988373986434844,
+      "f1-score": 0.7882678184172013,
+      "support": 3072
+    },
+    "weighted avg": {
+      "precision": 0.7732439510574061,
+      "recall": 0.8017578125,
+      "f1-score": 0.7867897681845927,
+      "support": 3072
+    }
+  },
+  "ner_history": [
+    {
+      "epoch": 1.0,
+      "eval_f1": 0.7670454545454545,
+      "eval_loss": 0.21116341650485992,
+      "eval_precision": 0.7444852941176471,
+      "eval_recall": 0.791015625,
+      "eval_runtime": 1.595,
+      "eval_samples_per_second": 842.026,
+      "eval_steps_per_second": 26.333,
+      "step": 672
+    },
+    {
+      "epoch": 2.0,
+      "eval_f1": 0.7800869985500242,
+      "eval_loss": 0.19262850284576416,
+      "eval_precision": 0.7722488038277512,
+      "eval_recall": 0.7880859375,
+      "eval_runtime": 1.5917,
+      "eval_samples_per_second": 843.76,
+      "eval_steps_per_second": 26.387,
+      "step": 1344
+    },
+    {
+      "epoch": 3.0,
+      "eval_f1": 0.7863984674329502,
+      "eval_loss": 0.20916080474853516,
+      "eval_precision": 0.7716165413533834,
+      "eval_recall": 0.8017578125,
+      "eval_runtime": 1.6027,
+      "eval_samples_per_second": 837.949,
+      "eval_steps_per_second": 26.205,
+      "step": 2016
+    }
+  ],
+  "lora": {
+    "baseline_test": {
+      "total": 1319,
+      "correct": 482,
+      "accuracy": 0.36542835481425323,
+      "format_compliant": 685,
+      "format_compliance_rate": 0.5193328278999242,
+      "accuracy_when_extracted": 0.7036496350364964,
+      "answer_mismatch": 203,
+      "extraction_failed": 634
+    },
+    "lora_test": {
+      "total": 1319,
+      "correct": 654,
+      "accuracy": 0.49583017437452614,
+      "format_compliant": 1314,
+      "format_compliance_rate": 0.9962092494313874,
+      "accuracy_when_extracted": 0.4977168949771689,
+      "answer_mismatch": 660,
+      "extraction_failed": 5
+    },
+    "sweep-baseline/validation": {
+      "total": 748,
+      "correct": 289,
+      "accuracy": 0.38636363636363635,
+      "format_compliant": 387,
+      "format_compliance_rate": 0.517379679144385,
+      "accuracy_when_extracted": 0.7467700258397932,
+      "answer_mismatch": 98,
+      "extraction_failed": 361
+    },
+    "sweep-lr2e-4/validation": {
+      "total": 748,
+      "correct": 460,
+      "accuracy": 0.6149732620320856,
+      "format_compliant": 747,
+      "format_compliance_rate": 0.9986631016042781,
+      "accuracy_when_extracted": 0.6157965194109772,
+      "answer_mismatch": 287,
+      "extraction_failed": 1
+    },
+    "sweep-lr1e-4/validation": {
+      "total": 748,
+      "correct": 467,
+      "accuracy": 0.6243315508021391,
+      "format_compliant": 744,
+      "format_compliance_rate": 0.9946524064171123,
+      "accuracy_when_extracted": 0.6276881720430108,
+      "answer_mismatch": 277,
+      "extraction_failed": 4
+    },
+    "sweep-lr5e-5/validation": {
+      "total": 748,
+      "correct": 453,
+      "accuracy": 0.6056149732620321,
+      "format_compliant": 739,
+      "format_compliance_rate": 0.9879679144385026,
+      "accuracy_when_extracted": 0.6129905277401895,
+      "answer_mismatch": 286,
+      "extraction_failed": 9
+    }
+  },
+  "lora_legacy_v1": {
+    "baseline_test": {
+      "total": 1319,
+      "correct": 482,
+      "accuracy": 0.36542835481425323,
+      "format_compliant": 685,
+      "format_compliance_rate": 0.5193328278999242,
+      "accuracy_when_extracted": 0.7036496350364964,
+      "answer_mismatch": 203,
+      "extraction_failed": 634
+    },
+    "lora_test": {
+      "total": 1319,
+      "correct": 655,
+      "accuracy": 0.4965883244882487,
+      "format_compliant": 1314,
+      "format_compliance_rate": 0.9962092494313874,
+      "accuracy_when_extracted": 0.4984779299847793,
+      "answer_mismatch": 659,
+      "extraction_failed": 5
+    },
+    "sweep-baseline/validation": {
+      "total": 748,
+      "correct": 289,
+      "accuracy": 0.38636363636363635,
+      "format_compliant": 387,
+      "format_compliance_rate": 0.517379679144385,
+      "accuracy_when_extracted": 0.7467700258397932,
+      "answer_mismatch": 98,
+      "extraction_failed": 361
+    },
+    "sweep-lr2e-4/validation": {
+      "total": 748,
+      "correct": 460,
+      "accuracy": 0.6149732620320856,
+      "format_compliant": 747,
+      "format_compliance_rate": 0.9986631016042781,
+      "accuracy_when_extracted": 0.6157965194109772,
+      "answer_mismatch": 287,
+      "extraction_failed": 1
+    },
+    "sweep-lr1e-4/validation": {
+      "total": 748,
+      "correct": 467,
+      "accuracy": 0.6243315508021391,
+      "format_compliant": 744,
+      "format_compliance_rate": 0.9946524064171123,
+      "accuracy_when_extracted": 0.6276881720430108,
+      "answer_mismatch": 277,
+      "extraction_failed": 4
+    },
+    "sweep-lr5e-5/validation": {
+      "total": 748,
+      "correct": 453,
+      "accuracy": 0.6056149732620321,
+      "format_compliant": 739,
+      "format_compliance_rate": 0.9879679144385026,
+      "accuracy_when_extracted": 0.6129905277401895,
+      "answer_mismatch": 286,
+      "extraction_failed": 9
+    }
+  },
+  "scoring_version": "numeric-v2-leading-decimal",
+  "scoring_corrections_from_saved_decisions": {
+    "baseline_test": [],
+    "lora_test": [
+      {
+        "question_id": "493",
+        "reference_answer": "25",
+        "extracted_answer": ".25",
+        "legacy_correct": true,
+        "current_correct": false
+      }
+    ],
+    "sweep-baseline/validation": [],
+    "sweep-lr2e-4/validation": [],
+    "sweep-lr1e-4/validation": [],
+    "sweep-lr5e-5/validation": []
+  },
+  "lora_validation_loss": {
+    "qwen2.5-1.5b-gsm8k": 0.33050867915153503,
+    "sweep-lr1e-4": 0.3369728624820709,
+    "sweep-lr5e-5": 0.3457998037338257
+  },
+  "cached_translation_pair_audit": {
+    "revision": "1f9f6191d0e91a3c539c2595e2fe48fc1420de9b",
+    "matched_pairs": 6355,
+    "scope": "Exact source/reference correspondence and exact duplicates; not a language or semantic-quality audit",
+    "overlap": {
+      "scope": "Exact text only; not language identification or semantic alignment",
+      "split_sizes": {
+        "train": 114376,
+        "validation": 6354,
+        "test": 6355
+      },
+      "within_split_duplicates_beyond_first": {
+        "train": {
+          "pair": 540,
+          "source": 1054,
+          "target": 1110
+        },
+        "validation": {
+          "pair": 7,
+          "source": 16,
+          "target": 15
+        },
+        "test": {
+          "pair": 7,
+          "source": 16,
+          "target": 16
+        }
+      },
+      "cross_split": {
+        "train/validation": {
+          "pair": {
+            "shared_unique_keys": 43,
+            "left_occurrences": 236,
+            "right_occurrences": 50
+          },
+          "source": {
+            "shared_unique_keys": 73,
+            "left_occurrences": 437,
+            "right_occurrences": 89
+          },
+          "target": {
+            "shared_unique_keys": 73,
+            "left_occurrences": 479,
+            "right_occurrences": 88
+          }
+        },
+        "train/test": {
+          "pair": {
+            "shared_unique_keys": 45,
+            "left_occurrences": 218,
+            "right_occurrences": 52
+          },
+          "source": {
+            "shared_unique_keys": 79,
+            "left_occurrences": 453,
+            "right_occurrences": 94
+          },
+          "target": {
+            "shared_unique_keys": 72,
+            "left_occurrences": 420,
+            "right_occurrences": 86
+          }
+        },
+        "validation/test": {
+          "pair": {
+            "shared_unique_keys": 12,
+            "left_occurrences": 14,
+            "right_occurrences": 18
+          },
+          "source": {
+            "shared_unique_keys": 15,
+            "left_occurrences": 28,
+            "right_occurrences": 29
+          },
+          "target": {
+            "shared_unique_keys": 24,
+            "left_occurrences": 32,
+            "right_occurrences": 35
+          }
+        }
+      },
+      "identical_source_target": {
+        "train": 81,
+        "validation": 6,
+        "test": 5
+      }
+    },
+    "examples": {
+      "2": {
+        "src": "Et cependant d’ou provenait ce sang dont on voyait par terre une couche si épaisse ?",
+        "tgt": "But, on the other hand, whose blood was that which lay so thickly upon the floor?"
+      },
+      "14": {
+        "src": "What was Fix's object?",
+        "tgt": "Il y avait là une concordance au moins bizarre."
+      }
+    }
+  },
+  "translation_clean": {
+    "run_dir": "machine_translation/outputs/en-fr-clean-v1-seed42",
+    "metric": {
+      "bleu": 13.686373991065928,
+      "bleu_1_to_4_precisions": [
+        44.66931639940914,
+        18.60741256748413,
+        9.072849865642361,
+        4.652802255904124
+      ],
+      "brevity_penalty": 1.0,
+      "system_length": 131334,
+      "reference_length": 124818,
+      "num_examples": 5008,
+      "sacrebleu_signature": "nrefs:1|case:mixed|eff:no|tok:13a|smooth:exp|version:2.6.0",
+      "sacrebleu_configuration": {
+        "metric": "corpus BLEU",
+        "implementation": "SacreBLEU",
+        "reference_count": 1,
+        "max_ngram_order": 4,
+        "tokenizer": "13a",
+        "lowercase": false,
+        "smoothing": "exp",
+        "effective_order": false,
+        "brevity_penalty": "SacreBLEU default"
+      }
+    },
+    "chrf_plus_plus": {
+      "score": 38.48426164232171,
+      "signature": "nrefs:1|case:mixed|eff:yes|nc:6|nw:2|space:no|version:2.6.0"
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "global_step": 1409,
+        "train_loss": 4.953620903211151,
+        "validation_loss": 4.259696563925584,
+        "seconds": 69.5085110142827
+      },
+      {
+        "epoch": 2,
+        "global_step": 2818,
+        "train_loss": 4.126425697883593,
+        "validation_loss": 3.8249260361902153,
+        "seconds": 68.90354759339243
+      },
+      {
+        "epoch": 3,
+        "global_step": 4227,
+        "train_loss": 3.8133996371359062,
+        "validation_loss": 3.578030203673714,
+        "seconds": 68.99350868258625
+      },
+      {
+        "epoch": 4,
+        "global_step": 5636,
+        "train_loss": 3.608903623424643,
+        "validation_loss": 3.3969402250690175,
+        "seconds": 68.90037766098976
+      },
+      {
+        "epoch": 5,
+        "global_step": 7045,
+        "train_loss": 3.432404034492666,
+        "validation_loss": 3.21424863288202,
+        "seconds": 68.61153038963675
+      },
+      {
+        "epoch": 6,
+        "global_step": 8454,
+        "train_loss": 3.25826091100677,
+        "validation_loss": 3.0472600960087233,
+        "seconds": 68.81491713225842
+      },
+      {
+        "epoch": 7,
+        "global_step": 9863,
+        "train_loss": 3.088428467059966,
+        "validation_loss": 2.920185286861628,
+        "seconds": 68.9238779945299
+      },
+      {
+        "epoch": 8,
+        "global_step": 11272,
+        "train_loss": 2.9340504593303396,
+        "validation_loss": 2.78078248312604,
+        "seconds": 68.9188108695671
+      },
+      {
+        "epoch": 9,
+        "global_step": 12681,
+        "train_loss": 2.8045618041776113,
+        "validation_loss": 2.6907886326277755,
+        "seconds": 68.8931155493483
+      },
+      {
+        "epoch": 10,
+        "global_step": 14090,
+        "train_loss": 2.699452908180245,
+        "validation_loss": 2.5822919697080136,
+        "seconds": 68.73258416820318
+      },
+      {
+        "epoch": 11,
+        "global_step": 15499,
+        "train_loss": 2.6072054836297744,
+        "validation_loss": 2.50513165708097,
+        "seconds": 68.87090100720525
+      },
+      {
+        "epoch": 12,
+        "global_step": 16908,
+        "train_loss": 2.5252465186291073,
+        "validation_loss": 2.443814421035987,
+        "seconds": 68.88906301371753
+      }
+    ],
+    "overlap": {
+      "scope": "Exact text only; not language identification or semantic alignment",
+      "split_sizes": {
+        "train": 90126,
+        "validation": 5007,
+        "test": 5008
+      },
+      "within_split_duplicates_beyond_first": {
+        "train": {
+          "pair": 0,
+          "source": 45,
+          "target": 41
+        },
+        "validation": {
+          "pair": 0,
+          "source": 2,
+          "target": 2
+        },
+        "test": {
+          "pair": 0,
+          "source": 6,
+          "target": 2
+        }
+      },
+      "cross_split": {
+        "train/validation": {
+          "pair": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          },
+          "source": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          },
+          "target": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          }
+        },
+        "train/test": {
+          "pair": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          },
+          "source": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          },
+          "target": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          }
+        },
+        "validation/test": {
+          "pair": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          },
+          "source": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          },
+          "target": {
+            "shared_unique_keys": 0,
+            "left_occurrences": 0,
+            "right_occurrences": 0
+          }
+        }
+      },
+      "identical_source_target": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      }
+    },
+    "would_truncate_by_split": {
+      "train": {
+        "src": 138,
+        "tgt": 381
+      },
+      "validation": {
+        "src": 7,
+        "tgt": 19
+      },
+      "test": {
+        "src": 7,
+        "tgt": 25
+      }
+    },
+    "manifest_sha256": "702947dcdd5cff1ce384251197ff28a6b047a5b24f7108cfaf2ba264ce708093",
+    "cleaning": {
+      "input_rows": 127085,
+      "kept_rows": 100141,
+      "rejections": {
+        "duplicate_pair": 41,
+        "identical": 49,
+        "length_ratio": 66,
+        "low_language_confidence": 11000,
+        "reversed_language": 8934,
+        "too_long": 1351,
+        "too_short": 3417,
+        "unexpected_language": 2086
+      },
+      "split_policy": "NFKC/whitespace normalization; filter; exact pair dedup; shuffle connected same-source OR same-target groups",
+      "limitations": "Language confidence is a screening heuristic, not semantic alignment; no book metadata or blind human audit"
+    },
+    "candidate_examples": [
+      {
+        "test_line": 1,
+        "row_id": "31209",
+        "source": "\"Glad to see you, Jackson,\" said my companion.",
+        "reference": "-- Enchanté de vous voir, Jackson, dit mon ami.",
+        "prediction": "-- Donnez-vous voir, dit Jackson en mon compagnon.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 2,
+        "row_id": "58351",
+        "source": "They cracked, and that was all.",
+        "reference": "Elles craquèrent, et voilà tout.",
+        "prediction": "Ils creuxèrent, c'était tout.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 3,
+        "row_id": "85465",
+        "source": "This question would have troubled him little when he was ambitious; then, not to succeed in life was the only disgrace in his eyes.",
+        "reference": "Cette question l’eût bien peu occupé quand il était ambitieux ; alors ne pas réussir était la seule honte à ses yeux.",
+        "prediction": "Cette question eût embarrassé, quand il était irrébitieux; puis, ne réussit pas à la vie, il ne réussit à la vie qu’à ses yeux.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 4,
+        "row_id": "55729",
+        "source": "She was swarthy of complexion, but one divined that, by day, her skin must possess that beautiful golden tone of the Andalusians and the Roman women.",
+        "reference": "Elle était brune, mais on devinait que le jour sa peau devait avoir ce beau reflet doré des Andalouses et des Romaines.",
+        "prediction": "Elle était d’un teint, mais un jour, qu’on la peau, il faut la peau d’or, que le ton d’or, et les femmes de Rouss.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 5,
+        "row_id": "20605",
+        "source": "But this is by-the-bye.",
+        "reference": "Mais que cela soit dit en passant.",
+        "prediction": "Mais ce n'est que par le plus de l'Adieu.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 6,
+        "row_id": "115621",
+        "source": "It was an old debt contracted during the last strike.",
+        "reference": "C'était une vieille dette, contractée pendant la derniere greve.",
+        "prediction": "C'était une vieille dette dette, pendant la dernière greve.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 7,
+        "row_id": "77067",
+        "source": "This wifely opinion was justified.",
+        "reference": "Ce jugement conjugal était raisonnable.",
+        "prediction": "Cette femme était justement juste.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 8,
+        "row_id": "54897",
+        "source": "Whatever may be thought of this triple explanation, political, physical, and poetical, of the burning of the law courts in 1618, the unfortunate fact of the fire is certain.",
+        "reference": "Quoi qu’on pense de cette triple explication politique, physique, poétique, de l’incendie du Palais de Justice en 1618, le fait malheureusement certain, c’est l’incendie.",
+        "prediction": "Ce qui peut être de cette épreuve, cette explication politique, politique physique, morale, et le poète brûlant du Palais de la cour, dans le 16818, est certain.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 9,
+        "row_id": "90660",
+        "source": "Which didn't satisfy the Canadian, who that day asked me where we were going.",
+        "reference": "Ce qui ne satisfit pas le Canadien, qui, ce jour-là, me demanda où nous allions.",
+        "prediction": "Le Canadien ne voulut pas satisfaire qui me demanda où nous allions.",
+        "review_status": "systematic_first_10_not_student_verified"
+      },
+      {
+        "test_line": 10,
+        "row_id": "101551",
+        "source": "\"We did not leave Granite House,\" answered Cyrus Harding, \"and if a fire appeared on the coast, it was lighted by another hand than ours!\"",
+        "reference": "-- Nous n'avons pas quitté Granite-House, répondit Cyrus Smith, et si un feu a paru sur la côte, c'est une autre main que la nôtre qui l'a allumé!»",
+        "prediction": "-- Nous ne nous laisserons pas à Granite-House, répondit Cyrus Smith, et si un feu paraissait avoir été allumée, c'était une autre main que notre main!»",
+        "review_status": "systematic_first_10_not_student_verified"
+      }
+    ],
+    "comparison_limit": "Different cleaned/grouped test set; not a controlled improvement over the legacy BLEU"
+  }
+}

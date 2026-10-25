@@ -1,0 +1,1233 @@
+{
+  "scope": "Saved selected-dev diagnostics, not independent test performance",
+  "span_convention": "Zero-based character positions, exclusive end",
+  "dev_examples": 1343,
+  "characters_without_supervised_token": 0,
+  "train_dev_exact_text_overlap": 0,
+  "metrics": {
+    "address": {
+      "precision": 0.6004901960784313,
+      "recall": 0.6568364611260054,
+      "f1-score": 0.6274007682458387,
+      "support": 373
+    },
+    "book": {
+      "precision": 0.8389261744966443,
+      "recall": 0.8116883116883117,
+      "f1-score": 0.8250825082508252,
+      "support": 154
+    },
+    "company": {
+      "precision": 0.7688442211055276,
+      "recall": 0.8095238095238095,
+      "f1-score": 0.7886597938144331,
+      "support": 378
+    },
+    "game": {
+      "precision": 0.7839506172839507,
+      "recall": 0.8610169491525423,
+      "f1-score": 0.8206785137318255,
+      "support": 295
+    },
+    "government": {
+      "precision": 0.7695167286245354,
+      "recall": 0.8380566801619433,
+      "f1-score": 0.8023255813953488,
+      "support": 247
+    },
+    "movie": {
+      "precision": 0.8705035971223022,
+      "recall": 0.8013245033112583,
+      "f1-score": 0.8344827586206897,
+      "support": 151
+    },
+    "name": {
+      "precision": 0.8434959349593496,
+      "recall": 0.8924731182795699,
+      "f1-score": 0.8672936259143156,
+      "support": 465
+    },
+    "organization": {
+      "precision": 0.7834224598930482,
+      "recall": 0.7983651226158038,
+      "f1-score": 0.7908232118758435,
+      "support": 367
+    },
+    "position": {
+      "precision": 0.7977011494252874,
+      "recall": 0.8013856812933026,
+      "f1-score": 0.7995391705069125,
+      "support": 433
+    },
+    "scene": {
+      "precision": 0.7352941176470589,
+      "recall": 0.7177033492822966,
+      "f1-score": 0.7263922518159807,
+      "support": 209
+    },
+    "micro avg": {
+      "precision": 0.7716165413533834,
+      "recall": 0.8017578125,
+      "f1-score": 0.7863984674329502,
+      "support": 3072
+    },
+    "macro avg": {
+      "precision": 0.7792145196636134,
+      "recall": 0.7988373986434844,
+      "f1-score": 0.7882678184172013,
+      "support": 3072
+    },
+    "weighted avg": {
+      "precision": 0.7732439510574061,
+      "recall": 0.8017578125,
+      "f1-score": 0.7867897681845927,
+      "support": 3072
+    }
+  },
+  "entity_errors": {
+    "true_positive": 2463,
+    "false_negative": 609,
+    "false_positive": 729,
+    "false_negative_categories": {
+      "no_overlapping_entity": 149,
+      "overlap_wrong_type_and_boundary": 51,
+      "same_span_wrong_type": 152,
+      "same_type_wrong_boundary": 257
+    },
+    "false_positive_categories": {
+      "no_overlapping_entity": 250,
+      "overlap_wrong_type_and_boundary": 60,
+      "same_span_wrong_type": 152,
+      "same_type_wrong_boundary": 267
+    },
+    "same_span_type_confusions": {
+      "address->company": 3,
+      "address->organization": 6,
+      "address->scene": 22,
+      "book->company": 4,
+      "book->game": 7,
+      "book->movie": 3,
+      "company->address": 2,
+      "company->book": 2,
+      "company->game": 1,
+      "company->government": 2,
+      "company->name": 12,
+      "company->organization": 1,
+      "game->movie": 4,
+      "game->organization": 3,
+      "government->company": 3,
+      "government->game": 1,
+      "government->organization": 4,
+      "movie->book": 6,
+      "movie->game": 9,
+      "name->company": 1,
+      "name->movie": 1,
+      "name->organization": 2,
+      "name->scene": 1,
+      "organization->address": 1,
+      "organization->company": 5,
+      "organization->game": 3,
+      "organization->government": 7,
+      "organization->name": 5,
+      "organization->scene": 1,
+      "position->game": 1,
+      "position->government": 3,
+      "position->name": 2,
+      "scene->address": 23,
+      "scene->company": 1
+    },
+    "surface_type_seen_in_training": {
+      "seen": {
+        "gold": 1908,
+        "predicted": 1953,
+        "correct": 1680,
+        "precision": 0.8602150537634409,
+        "recall": 0.8805031446540881,
+        "f1": 0.8702408702408703
+      },
+      "unseen": {
+        "gold": 1164,
+        "predicted": 1239,
+        "correct": 783,
+        "precision": 0.6319612590799032,
+        "recall": 0.6726804123711341,
+        "f1": 0.651685393258427
+      }
+    },
+    "category_definition": "Each unmatched gold/pred entity assigned once: same-span wrong type, else overlapping same-type boundary, else overlapping other-type, else no overlap. FN/FP partitions are independent existence rules, not one-to-one error matches."
+  },
+  "sampling_seed": 42,
+  "candidate_examples": [
+    {
+      "dev_index": 277,
+      "side": "false_negative",
+      "category": "no_overlapping_entity",
+      "entity": [
+        0,
+        2,
+        "scene"
+      ],
+      "text": "南段又称夏威夷海滩、国王海滩，可在此租船出海。",
+      "gold_spans": [
+        [
+          0,
+          2,
+          "scene"
+        ],
+        [
+          4,
+          9,
+          "scene"
+        ],
+        [
+          10,
+          14,
+          "scene"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          4,
+          9,
+          "scene"
+        ],
+        [
+          10,
+          14,
+          "scene"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 53,
+      "side": "false_negative",
+      "category": "no_overlapping_entity",
+      "entity": [
+        12,
+        14,
+        "address"
+      ],
+      "text": "曾参与打击私彩行动的一位长春警官告诉记者，过去公开销售非法彩票出具打印或手写的书面凭证，",
+      "gold_spans": [
+        [
+          12,
+          14,
+          "address"
+        ],
+        [
+          14,
+          16,
+          "position"
+        ],
+        [
+          18,
+          20,
+          "position"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          14,
+          16,
+          "position"
+        ],
+        [
+          18,
+          20,
+          "position"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 692,
+      "side": "false_negative",
+      "category": "no_overlapping_entity",
+      "entity": [
+        35,
+        37,
+        "address"
+      ],
+      "text": "所以传统项目魔兽争霸III按理说也将被踢出WEM。不过由于WEM一直在中国举办，",
+      "gold_spans": [
+        [
+          6,
+          13,
+          "game"
+        ],
+        [
+          21,
+          24,
+          "organization"
+        ],
+        [
+          29,
+          32,
+          "organization"
+        ],
+        [
+          35,
+          37,
+          "address"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          6,
+          10,
+          "game"
+        ],
+        [
+          10,
+          13,
+          "game"
+        ],
+        [
+          21,
+          24,
+          "organization"
+        ],
+        [
+          29,
+          32,
+          "organization"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 407,
+      "side": "false_negative",
+      "category": "overlap_wrong_type_and_boundary",
+      "entity": [
+        1,
+        14,
+        "company"
+      ],
+      "text": "而Scrabulous开发者本身则并未采取行动。",
+      "gold_spans": [
+        [
+          1,
+          14,
+          "company"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          1,
+          11,
+          "game"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 396,
+      "side": "false_negative",
+      "category": "overlap_wrong_type_and_boundary",
+      "entity": [
+        2,
+        4,
+        "name"
+      ],
+      "text": "关于鲁迅及其著作》，这同时也是国内第一本评价鲁迅先生的书籍。“我从24岁起就迷上了鲁迅，",
+      "gold_spans": [
+        [
+          2,
+          4,
+          "name"
+        ],
+        [
+          22,
+          24,
+          "name"
+        ],
+        [
+          41,
+          43,
+          "name"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          9,
+          "book"
+        ],
+        [
+          22,
+          24,
+          "name"
+        ],
+        [
+          41,
+          43,
+          "name"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 243,
+      "side": "false_negative",
+      "category": "overlap_wrong_type_and_boundary",
+      "entity": [
+        28,
+        43,
+        "scene"
+      ],
+      "text": "棉花堡附近的古迹远远不止这一处白色宫殿，位于棉花堡上方的希拉波里斯hierapolis",
+      "gold_spans": [
+        [
+          0,
+          3,
+          "scene"
+        ],
+        [
+          22,
+          25,
+          "scene"
+        ],
+        [
+          28,
+          43,
+          "scene"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          3,
+          "scene"
+        ],
+        [
+          22,
+          24,
+          "address"
+        ],
+        [
+          28,
+          32,
+          "address"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 151,
+      "side": "false_negative",
+      "category": "same_span_wrong_type",
+      "entity": [
+        32,
+        36,
+        "company"
+      ],
+      "text": "（编者注：稿件为2009年银行卡安全有奖征文活动投稿，征文活动由金融时报主办，广电运通协办，",
+      "gold_spans": [
+        [
+          1,
+          3,
+          "position"
+        ],
+        [
+          32,
+          36,
+          "company"
+        ],
+        [
+          39,
+          43,
+          "company"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          1,
+          3,
+          "position"
+        ],
+        [
+          32,
+          36,
+          "book"
+        ],
+        [
+          39,
+          43,
+          "company"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 1253,
+      "side": "false_negative",
+      "category": "same_span_wrong_type",
+      "entity": [
+        33,
+        35,
+        "position"
+      ],
+      "text": "w岛把圆形发挥得淋漓尽致，全岛bose音响，24小时播放歌曲，还有dj在餐厅、",
+      "gold_spans": [
+        [
+          0,
+          2,
+          "scene"
+        ],
+        [
+          15,
+          19,
+          "company"
+        ],
+        [
+          33,
+          35,
+          "position"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          2,
+          "scene"
+        ],
+        [
+          33,
+          35,
+          "name"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 140,
+      "side": "false_negative",
+      "category": "same_span_wrong_type",
+      "entity": [
+        0,
+        4,
+        "book"
+      ],
+      "text": "新浪娱乐讯由知名演员张瑜首次独立执导的青春偶像电影《八十一格》将于9月全国公映。",
+      "gold_spans": [
+        [
+          0,
+          4,
+          "book"
+        ],
+        [
+          8,
+          10,
+          "position"
+        ],
+        [
+          10,
+          12,
+          "name"
+        ],
+        [
+          25,
+          31,
+          "movie"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          4,
+          "company"
+        ],
+        [
+          8,
+          10,
+          "position"
+        ],
+        [
+          10,
+          12,
+          "name"
+        ],
+        [
+          25,
+          31,
+          "movie"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 1073,
+      "side": "false_negative",
+      "category": "same_type_wrong_boundary",
+      "entity": [
+        0,
+        10,
+        "name"
+      ],
+      "text": "johnwalsh），黛博拉·格里本（deborahgribbon）以及迈克尔·布兰德（",
+      "gold_spans": [
+        [
+          0,
+          10,
+          "name"
+        ],
+        [
+          11,
+          34,
+          "name"
+        ],
+        [
+          36,
+          43,
+          "name"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          9,
+          "name"
+        ],
+        [
+          11,
+          19,
+          "name"
+        ],
+        [
+          19,
+          34,
+          "name"
+        ],
+        [
+          36,
+          43,
+          "name"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 81,
+      "side": "false_negative",
+      "category": "same_type_wrong_boundary",
+      "entity": [
+        25,
+        37,
+        "movie"
+      ],
+      "text": "三部无意过问奥斯卡奖的新片异常冷场，《卷土重来》（thecomebacks）、《萨拉和神秘时辰》（",
+      "gold_spans": [
+        [
+          18,
+          24,
+          "movie"
+        ],
+        [
+          25,
+          37,
+          "movie"
+        ],
+        [
+          39,
+          48,
+          "movie"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          6,
+          9,
+          "organization"
+        ],
+        [
+          18,
+          38,
+          "movie"
+        ],
+        [
+          39,
+          48,
+          "movie"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 81,
+      "side": "false_negative",
+      "category": "same_type_wrong_boundary",
+      "entity": [
+        18,
+        24,
+        "movie"
+      ],
+      "text": "三部无意过问奥斯卡奖的新片异常冷场，《卷土重来》（thecomebacks）、《萨拉和神秘时辰》（",
+      "gold_spans": [
+        [
+          18,
+          24,
+          "movie"
+        ],
+        [
+          25,
+          37,
+          "movie"
+        ],
+        [
+          39,
+          48,
+          "movie"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          6,
+          9,
+          "organization"
+        ],
+        [
+          18,
+          38,
+          "movie"
+        ],
+        [
+          39,
+          48,
+          "movie"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 125,
+      "side": "false_positive",
+      "category": "no_overlapping_entity",
+      "entity": [
+        7,
+        10,
+        "organization"
+      ],
+      "text": "安然初盘解读：不来梅主场挽颓势切尔西防范平局",
+      "gold_spans": [
+        [
+          0,
+          2,
+          "name"
+        ],
+        [
+          15,
+          18,
+          "organization"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          2,
+          "name"
+        ],
+        [
+          7,
+          10,
+          "organization"
+        ],
+        [
+          15,
+          18,
+          "organization"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 314,
+      "side": "false_positive",
+      "category": "no_overlapping_entity",
+      "entity": [
+        31,
+        38,
+        "scene"
+      ],
+      "text": "六月底到七月中旬，香港中央图书馆举行“书香·港情”的文学节，而香港电影资料馆则在此之前举办“",
+      "gold_spans": [
+        [
+          9,
+          16,
+          "scene"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          9,
+          16,
+          "address"
+        ],
+        [
+          31,
+          38,
+          "scene"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 327,
+      "side": "false_positive",
+      "category": "no_overlapping_entity",
+      "entity": [
+        18,
+        24,
+        "position"
+      ],
+      "text": "2015年浙江乌镇乌村旅游度假村民宿设计总负责人2016",
+      "gold_spans": [
+        [
+          5,
+          16,
+          "address"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          5,
+          16,
+          "address"
+        ],
+        [
+          18,
+          24,
+          "position"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 675,
+      "side": "false_positive",
+      "category": "overlap_wrong_type_and_boundary",
+      "entity": [
+        28,
+        30,
+        "company"
+      ],
+      "text": "人到中年才明白,活…刘书记老婆昨天【语音】胡昨天【链接】农家土特产店昨天农家土特产野味山货燕子:",
+      "gold_spans": [
+        [
+          28,
+          34,
+          "address"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          11,
+          13,
+          "position"
+        ],
+        [
+          28,
+          30,
+          "company"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 810,
+      "side": "false_positive",
+      "category": "overlap_wrong_type_and_boundary",
+      "entity": [
+        10,
+        12,
+        "organization"
+      ],
+      "text": "周一得到的最新消息是奥尔堡医务主管博瓦德（henrikbogvad）最终确认，中后卫彼詹普（",
+      "gold_spans": [
+        [
+          10,
+          17,
+          "position"
+        ],
+        [
+          17,
+          20,
+          "name"
+        ],
+        [
+          21,
+          33,
+          "name"
+        ],
+        [
+          39,
+          42,
+          "position"
+        ],
+        [
+          42,
+          45,
+          "name"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          10,
+          12,
+          "organization"
+        ],
+        [
+          13,
+          17,
+          "position"
+        ],
+        [
+          17,
+          20,
+          "name"
+        ],
+        [
+          21,
+          34,
+          "name"
+        ],
+        [
+          42,
+          45,
+          "name"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 72,
+      "side": "false_positive",
+      "category": "overlap_wrong_type_and_boundary",
+      "entity": [
+        10,
+        12,
+        "address"
+      ],
+      "text": "由林达集团投资开发的海渔广场就位于东四环内四方桥南，首期推出精装公寓海洋公寓——",
+      "gold_spans": [
+        [
+          1,
+          5,
+          "company"
+        ],
+        [
+          10,
+          14,
+          "scene"
+        ],
+        [
+          17,
+          20,
+          "address"
+        ],
+        [
+          21,
+          25,
+          "address"
+        ],
+        [
+          34,
+          38,
+          "scene"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          1,
+          5,
+          "company"
+        ],
+        [
+          10,
+          12,
+          "address"
+        ],
+        [
+          17,
+          25,
+          "address"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 1269,
+      "side": "false_positive",
+      "category": "same_span_wrong_type",
+      "entity": [
+        35,
+        39,
+        "government"
+      ],
+      "text": "住房公积金监管司日前公布2009年工作目标，有关负责人表示，今年将会同人民银行、保监会等部门，",
+      "gold_spans": [
+        [
+          0,
+          8,
+          "government"
+        ],
+        [
+          35,
+          39,
+          "company"
+        ],
+        [
+          40,
+          43,
+          "government"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          8,
+          "government"
+        ],
+        [
+          24,
+          27,
+          "position"
+        ],
+        [
+          35,
+          39,
+          "government"
+        ],
+        [
+          40,
+          43,
+          "government"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 335,
+      "side": "false_positive",
+      "category": "same_span_wrong_type",
+      "entity": [
+        0,
+        3,
+        "scene"
+      ],
+      "text": "夏威夷当然不止火山，除了火山，你还可以从空中俯看热带雨林和美丽的瀑布，这里是好莱坞大片的拍摄地，",
+      "gold_spans": [
+        [
+          0,
+          3,
+          "address"
+        ],
+        [
+          7,
+          9,
+          "scene"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          3,
+          "scene"
+        ],
+        [
+          24,
+          28,
+          "scene"
+        ],
+        [
+          38,
+          41,
+          "address"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 1253,
+      "side": "false_positive",
+      "category": "same_span_wrong_type",
+      "entity": [
+        33,
+        35,
+        "name"
+      ],
+      "text": "w岛把圆形发挥得淋漓尽致，全岛bose音响，24小时播放歌曲，还有dj在餐厅、",
+      "gold_spans": [
+        [
+          0,
+          2,
+          "scene"
+        ],
+        [
+          15,
+          19,
+          "company"
+        ],
+        [
+          33,
+          35,
+          "position"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          2,
+          "scene"
+        ],
+        [
+          33,
+          35,
+          "name"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 980,
+      "side": "false_positive",
+      "category": "same_type_wrong_boundary",
+      "entity": [
+        4,
+        5,
+        "government"
+      ],
+      "text": "如果我是寿险监管部的主任的话，会逐步放开，包括投资型产品的保护，",
+      "gold_spans": [
+        [
+          4,
+          9,
+          "government"
+        ],
+        [
+          10,
+          12,
+          "position"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          4,
+          5,
+          "government"
+        ],
+        [
+          10,
+          12,
+          "position"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 525,
+      "side": "false_positive",
+      "category": "same_type_wrong_boundary",
+      "entity": [
+        3,
+        14,
+        "address"
+      ],
+      "text": "日前，菲律宾的卡加延德奥罗市发生了一起越狱事件，5位犯人逃出监狱。他们可没有像《越狱》",
+      "gold_spans": [
+        [
+          7,
+          14,
+          "address"
+        ],
+        [
+          39,
+          43,
+          "movie"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          3,
+          14,
+          "address"
+        ],
+        [
+          39,
+          43,
+          "movie"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    },
+    {
+      "dev_index": 1084,
+      "side": "false_positive",
+      "category": "same_type_wrong_boundary",
+      "entity": [
+        16,
+        18,
+        "address"
+      ],
+      "text": "房地产经纪公司的员工告诉记者，回龙观及天通苑附近的中介公司，几乎都碰到过满5年经适房房主前来咨询“",
+      "gold_spans": [
+        [
+          0,
+          7,
+          "company"
+        ],
+        [
+          12,
+          14,
+          "position"
+        ],
+        [
+          15,
+          18,
+          "address"
+        ],
+        [
+          19,
+          22,
+          "address"
+        ]
+      ],
+      "predicted_spans": [
+        [
+          0,
+          5,
+          "company"
+        ],
+        [
+          12,
+          14,
+          "position"
+        ],
+        [
+          16,
+          18,
+          "address"
+        ],
+        [
+          19,
+          22,
+          "address"
+        ]
+      ],
+      "review_status": "automatic_candidate_not_student_verified"
+    }
+  ],
+  "source_sha256": {
+    "bert_ner/outputs/bert-base-chinese/dev_predictions.json": "d4d1c0d67eaf98a739fd0c07adb813c67db7db353cc47cdc3392e2a39b11fe0b",
+    "bert_ner/outputs/bert-base-chinese/config.json": "3b9769c65d6cb7a3da4ae51b02ca24c6ef29b04614b9b67512a27b1a425a61e0",
+    "bert_ner/outputs/bert-base-chinese/experiment_summary.json": "26771278dca3d29ae7ff0d6c336622bc6caac4c1590c4bdb09ca02959ed2f50a",
+    "bert_ner/data/cluener2020/train.json": "60299d202779dc84f3c3bd81f4dc08f5323d0dbf762cb50cd62dd51aa9a871f8",
+    "bert_ner/data/cluener2020/dev.json": "90036b59832e007c45d11eafe5ed80549f58a18a29aaa7fe8b1229622c69ec38",
+    "bert_ner/outputs/bert-base-chinese/best_model/config.json": "ce2d7f88c7adaa2b8d31ff69be2f1f09a1b2862b27200554f308ee3d484da5b3",
+    "bert_ner/outputs/bert-base-chinese/best_model/special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+    "bert_ner/outputs/bert-base-chinese/best_model/tokenizer.json": "1c262607a57d657df584affb5b55560aa01e38d836669660e79931269c065a89",
+    "bert_ner/outputs/bert-base-chinese/best_model/tokenizer_config.json": "1c441dfe412d9d7e47c960029a48a0159c23a38a9ab41b465d90fb1f520d4ced",
+    "bert_ner/outputs/bert-base-chinese/best_model/vocab.txt": "45bbac6b341c319adc98a532532882e91a9cefc0329aa57bac9ae761c27b291c"
+  }
+}

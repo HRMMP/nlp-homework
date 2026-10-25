@@ -1,0 +1,470 @@
+{
+  "tensor_count": 112,
+  "trainable_parameters": 1089536,
+  "total_parameters_recorded": 1544803840,
+  "trainable_ratio": 0.0007052908413277896,
+  "layers": 28,
+  "rank": 8,
+  "target_modules": [
+    "q_proj",
+    "v_proj"
+  ],
+  "scope": "Saved tensor/config audit, not independent proof of historical optimizer behavior or freezing",
+  "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "source_sha256": {
+    "lora_math_finetuning/outputs/qwen2.5-1.5b-gsm8k/final_adapter/adapter_model.safetensors": "b3a83913ed0ae5830e4dde534a1db1727f3b9a8d333d55c9a3b209172a0fbd6e",
+    "lora_math_finetuning/outputs/qwen2.5-1.5b-gsm8k/final_adapter/adapter_config.json": "209a7db55d310eb86312cd17d97ff57c3db29af189d26022d2958dae8cfa7d36",
+    "lora_math_finetuning/outputs/qwen2.5-1.5b-gsm8k/parameter_stats.json": "a23f6f32eccc489f0fd70c20097778ee9b778463edca85686418f95b3f34c6d8",
+    "lora_math_finetuning/outputs/qwen2.5-1.5b-gsm8k/config.json": "53daa9fa2ac8b5ea8b9345532da27f82b1354a691814b6b0ef5bb9494b28b4e2"
+  },
+  "shapes": {
+    "base_model.model.model.layers.0.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.0.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.0.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.0.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.1.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.1.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.1.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.1.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.10.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.10.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.10.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.10.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.11.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.11.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.11.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.11.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.12.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.12.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.12.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.12.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.13.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.13.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.13.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.13.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.14.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.14.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.14.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.14.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.15.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.15.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.15.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.15.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.16.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.16.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.16.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.16.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.17.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.17.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.17.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.17.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.18.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.18.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.18.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.18.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.19.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.19.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.19.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.19.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.2.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.2.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.2.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.2.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.20.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.20.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.20.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.20.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.21.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.21.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.21.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.21.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.22.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.22.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.22.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.22.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.23.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.23.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.23.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.23.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.24.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.24.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.24.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.24.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.25.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.25.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.25.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.25.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.26.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.26.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.26.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.26.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.27.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.27.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.27.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.27.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.3.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.3.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.3.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.3.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.4.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.4.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.4.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.4.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.5.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.5.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.5.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.5.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.6.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.6.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.6.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.6.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.7.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.7.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.7.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.7.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.8.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.8.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.8.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.8.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ],
+    "base_model.model.model.layers.9.self_attn.q_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.9.self_attn.q_proj.lora_B.weight": [
+      1536,
+      8
+    ],
+    "base_model.model.model.layers.9.self_attn.v_proj.lora_A.weight": [
+      8,
+      1536
+    ],
+    "base_model.model.model.layers.9.self_attn.v_proj.lora_B.weight": [
+      256,
+      8
+    ]
+  }
+}

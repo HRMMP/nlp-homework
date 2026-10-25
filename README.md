@@ -10,9 +10,9 @@
 
 | Lab | 目录 | 实验内容 | 当前进度 |
 | --- | --- | --- | --- |
-| Lab 1 | [`machine_translation/`](./machine_translation/) | 使用 Transformer 实现机器翻译，并使用 BLEU 评价翻译结果。 | 已实现 OPUS Books 英译法数据处理、Transformer 训练/解码/独立 BLEU 评估入口、配置与基础测试；仓库默认环境未安装依赖，已在临时环境通过测试和小规模 smoke，正式训练/测试集评估尚未运行。 |
-| Lab 2 | [`bert_ner/`](./bert_ner/) | 使用 BERT 完成命名实体识别，并报告 Precision、Recall 和 F1 Score。 | 已准备 CLUENER 2020 数据，加入数据审计、BIO/subword 对齐、实体级评估、训练入口和单元测试；尚未安装训练依赖或运行训练。 |
-| Lab 3 | [`lora_math_finetuning/`](./lora_math_finetuning/) | 在数学数据集上使用 LoRA 进行大模型参数高效微调，并在测试集上统计准确率。 | 已创建目录、要求文档和入门学习资料；尚未开始数据准备、代码实现和实验运行。 |
+| Lab 1 | [`machine_translation/`](./machine_translation/) | 使用 Transformer 实现机器翻译，并使用 BLEU 评价翻译结果。 | 已完成语言筛查、切分前去重、同源/同目标分组及 12 轮重训；5,008 条新测试预测 BLEU 13.69、chrF++ 38.48，精确跨集合重复为 0；未完成全量语义对齐人工审计。 |
+| Lab 2 | [`bert_ner/`](./bert_ner/) | 使用 BERT 完成命名实体识别，并报告 Precision、Recall 和 F1 Score。 | 已完成训练及 dev 错误/未见实体分析，实体级 F1 78.64%；TP/FN/FP=2,463/609/729。官方 test 无标签，当前不是独立测试成绩。 |
+| Lab 3 | [`lora_math_finetuning/`](./lora_math_finetuning/) | 在数学数据集上使用 LoRA 进行大模型参数高效微调，并在测试集上统计准确率。 | 已完成训练、测试、学习率对照及 adapter/判分审计；修正 `.25` 误判后严格准确率 36.54% → 49.58%，最后数字诊断 64.97% → 49.66%，不能据此声称推理能力提升。 |
 
 ## 当前项目状态
 
@@ -23,14 +23,14 @@
 - 明确每个实验的主要任务和评价指标。
 - 为三个实验补充面向零基础的分阶段学习资料。
 - 新增面向零基础的 [NLP 学习手册](./nlp_learn_handbook/README.md)，覆盖先修知识、经典方法、Transformer、BERT、GPT、LoRA、三个实验和可复现实验流程。
+- 三个实验均有训练产物、原始预测及可独立复算的指标；已有中文报告审阅稿。
+- 已完成[实验完善范围与审计记录](./reports/experiment_plan.md)中授权的技术补强；GPU 任务均经空闲检查后启动，日志和退出状态已保存，旧模型和原始预测未被覆盖。
 
 ### 尚未完成
 
-- 确认并准备机器翻译实验数据；运行小规模 smoke test 和正式训练，保存日志、检查点、测试集预测及 BLEU 结果。
-- 确认并准备 NER 实验的 CLUENER 2020 数据集；LoRA 实验仍需选择和准备数据集。
-- 完成各实验的小规模 smoke test。
-- 运行正式实验并保存日志、检查点和结构化结果。
-- 撰写实验结果分析和最终实验报告。
+- 由学生核验翻译清洗样本及三个实验的候选错误案例，按实际理解修订报告；语言识别不等于语义对齐审计。
+- NER 独立有标签评测、多 seed 或额外 LoRA 训练未纳入本轮，不将其写成已完成。
+- 补齐三人的信息、真实贡献、许可核查及最终提交确认；备份被 Git 忽略的实验产物。
 
 实验报告初稿及 XeLaTeX 编译说明见 [`reports/README.md`](./reports/README.md)。
 
