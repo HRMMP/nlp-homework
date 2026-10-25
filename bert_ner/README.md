@@ -29,7 +29,7 @@ cd bert_ner && python -m unittest discover -s tests -v
 
 ## 训练
 
-默认配置在 `bert_ner/config.json`，使用 `bert-base-chinese`、最大长度 256、随机种子 42、3 个 epoch。配置是待验证的起始参数，不代表已经运行或取得任何结果。
+默认配置在 `bert_ner/config.json`，使用 `bert-base-chinese`、最大长度 256、随机种子 42、3 个 epoch。本机已完成一次训练，dev 实体级 Precision / Recall / F1 为 77.16% / 80.18% / 78.64%。dev 同时用于选模，不能把这些数字描述为独立测试成绩。
 
 ```bash
 python bert_ner/run_ner.py train --config bert_ner/config.json
@@ -48,4 +48,17 @@ python bert_ner/run_ner.py evaluate bert_ner/outputs/bert-base-chinese/dev_predi
 - 实体指标由 `seqeval` 按 strict IOB2 计算 micro Precision、Recall、F1；`O` 不作为实体类别计分。
 - `test.json` 是无标签数据，当前流程不对其产生测试指标。
 
-完整训练、正式结果、错误分析及许可证确认仍待实际执行和核验；本仓库不会预填实验数值。
+## 保存预测的错误审计
+
+无需 GPU 或重新训练：
+
+```bash
+CUDA_VISIBLE_DEVICES='' python bert_ner/analyze.py \
+  --output reports/evidence/ner_analysis.json
+```
+
+工具用保存的 fast tokenizer 回查 gold/字符位置，用 seqeval strict IOB2 提取实体，并验证跨度 TP/FP/FN 与实体指标一致。当前 TP=2,463、FN=609、FP=729；FN 中同类别错边界 257、同边界错类别 152、边界和类别均不同且有重叠 51、无重叠预测 149。FP 独立按相同优先规则分类，各侧每个错误实体只归一类，不宣称完成一对一错误匹配。
+
+按“实体原文＋类别是否在 train 出现”分组，seen / unseen 的 F1 为 87.02% / 65.17%，对应 gold 支持数 1,908 / 1,164；这不是分词器 OOV 或独立泛化测量。JSON 包含完整 10 类指标、同边界类别混淆、输入哈希和固定 seed 的候选错误实例。实例是自动抽样，仍须学生核验解释。当前静态检查问题已修正，未改变有效输入的标签转换或模型预测。
+
+本机已有训练检查点、dev 预测和报告审阅稿。本次使用已保存的 tokenizer 回查 1,343 条 dev，gold 标签全部一致，dev 无字符因当前分词/截断失去监督位置；train/dev 原始文本精确交集为 0，不代表已排除近重复。仍须学生核验错误案例、确认数据许可，并决定是否另行设计有标签独立评测；不能将当前模型已训练过的样本临时划成 test。实验完善范围见 [`../reports/experiment_plan.md`](../reports/experiment_plan.md)。

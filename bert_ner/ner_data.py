@@ -7,13 +7,19 @@ from pathlib import Path
 from typing import Any
 
 LABEL_TYPES = (
-    "address", "book", "company", "game", "government", "movie",
-    "name", "organization", "position", "scene",
+    "address",
+    "book",
+    "company",
+    "game",
+    "government",
+    "movie",
+    "name",
+    "organization",
+    "position",
+    "scene",
 )
 LABELS = ("O",) + tuple(
-    f"{prefix}-{entity_type}"
-    for entity_type in LABEL_TYPES
-    for prefix in ("B", "I")
+    f"{prefix}-{entity_type}" for entity_type in LABEL_TYPES for prefix in ("B", "I")
 )
 LABEL_TO_ID = {label: index for index, label in enumerate(LABELS)}
 ID_TO_LABEL = {index: label for label, index in LABEL_TO_ID.items()}
@@ -25,8 +31,10 @@ def load_jsonl(path: str | Path, require_labels: bool = True) -> list[dict[str, 
     with Path(path).open(encoding="utf-8") as stream:
         for line_number, line in enumerate(stream, start=1):
             row = json.loads(line)
-            if not isinstance(row.get("text"), str):
-                raise ValueError(f"{path}:{line_number}: missing string 'text'")
+            if "text" not in row:
+                raise ValueError(f"{path}:{line_number}: missing 'text'")
+            if not isinstance(row["text"], str):
+                raise TypeError(f"{path}:{line_number}: 'text' must be a string")
             if require_labels and "label" not in row:
                 raise ValueError(f"{path}:{line_number}: labels are required")
             if "label" in row:
@@ -35,20 +43,28 @@ def load_jsonl(path: str | Path, require_labels: bool = True) -> list[dict[str, 
     return rows
 
 
-def _extract_spans(text: str, labels: dict[str, Any], path: str | Path, line_number: int):
+def _extract_spans(
+    text: str, labels: dict[str, Any], path: str | Path, line_number: int
+):
     spans = []
     for entity_type, mentions in labels.items():
         if entity_type not in LABEL_TYPES:
-            raise ValueError(f"{path}:{line_number}: unknown entity type {entity_type!r}")
+            raise ValueError(
+                f"{path}:{line_number}: unknown entity type {entity_type!r}"
+            )
         for entity, ranges in mentions.items():
             for span in ranges:
                 if len(span) != 2:
                     raise ValueError(f"{path}:{line_number}: invalid span {span!r}")
                 start, end = span
                 if start < 0 or end < start or end >= len(text):
-                    raise ValueError(f"{path}:{line_number}: out-of-range span {span!r}")
+                    raise ValueError(
+                        f"{path}:{line_number}: out-of-range span {span!r}"
+                    )
                 if text[start : end + 1] != entity:
-                    raise ValueError(f"{path}:{line_number}: span {span!r} does not match {entity!r}")
+                    raise ValueError(
+                        f"{path}:{line_number}: span {span!r} does not match {entity!r}"
+                    )
                 spans.append((start, end, entity_type))
     return spans
 
@@ -71,7 +87,9 @@ def to_bio(text: str, labels: dict[str, Any]) -> tuple[list[str], list[str], int
     return list(text), tags, ignored_overlaps
 
 
-def align_subword_labels(word_ids: list[int | None], word_labels: list[int]) -> list[int]:
+def align_subword_labels(
+    word_ids: list[int | None], word_labels: list[int]
+) -> list[int]:
     """Label only the first subword of each character; ignore other pieces."""
     aligned = []
     previous_word_id = None
@@ -86,9 +104,13 @@ def align_subword_labels(word_ids: list[int | None], word_labels: list[int]) -> 
     return aligned
 
 
-def encode_example(example: dict[str, Any], tokenizer: Any, max_length: int) -> dict[str, Any]:
+def encode_example(
+    example: dict[str, Any], tokenizer: Any, max_length: int
+) -> dict[str, Any]:
     chars, tags, _ = to_bio(example["text"], example["label"])
-    encoded = tokenizer(chars, is_split_into_words=True, truncation=True, max_length=max_length)
+    encoded = tokenizer(
+        chars, is_split_into_words=True, truncation=True, max_length=max_length
+    )
     encoded["labels"] = align_subword_labels(
         encoded.word_ids(), [LABEL_TO_ID[tag] for tag in tags]
     )

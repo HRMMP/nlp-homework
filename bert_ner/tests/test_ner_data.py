@@ -10,10 +10,18 @@ class NerDataTests(unittest.TestCase):
             {"name": {"张三": [[0, 1]]}, "organization": {"北京大学": [[3, 6]]}},
         )
         self.assertEqual("".join(chars), "张三在北京大学")
-        self.assertEqual(labels, [
-            "B-name", "I-name", "O", "B-organization", "I-organization",
-            "I-organization", "I-organization",
-        ])
+        self.assertEqual(
+            labels,
+            [
+                "B-name",
+                "I-name",
+                "O",
+                "B-organization",
+                "I-organization",
+                "I-organization",
+                "I-organization",
+            ],
+        )
         self.assertEqual(ignored, 0)
 
     def test_longest_nested_span_is_kept_and_counted(self):

@@ -3,4 +3,5 @@
 torch>=2.2
 transformers>=4.46,<5
 datasets>=3,<5
+accelerate>=0.26
 seqeval>=1.2.2

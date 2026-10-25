@@ -10,9 +10,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-
-from ner_data import ID_TO_LABEL, LABELS, encode_example, load_jsonl, to_bio
 from metrics import compute_entity_metrics
+from ner_data import ID_TO_LABEL, LABELS, encode_example, load_jsonl, to_bio
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data" / "cluener2020"
@@ -26,23 +25,29 @@ def audit_data() -> None:
         ignored_overlaps = 0
         for row in rows:
             for entity_type, mentions in row.get("label", {}).items():
-                entity_counts[entity_type] += sum(len(spans) for spans in mentions.values())
+                entity_counts[entity_type] += sum(
+                    len(spans) for spans in mentions.values()
+                )
             if "label" in row:
                 _, _, ignored = to_bio(row["text"], row["label"])
                 ignored_overlaps += ignored
-        print(json.dumps({
-            "split": split,
-            "sentences": len(rows),
-            "labeled": "label" in rows[0],
-            "entities_by_type": dict(sorted(entity_counts.items())),
-            "nested_entities_ignored_by_flat_bio": ignored_overlaps,
-        }, ensure_ascii=False))
+        print(
+            json.dumps(
+                {
+                    "split": split,
+                    "sentences": len(rows),
+                    "labeled": "label" in rows[0],
+                    "entities_by_type": dict(sorted(entity_counts.items())),
+                    "nested_entities_ignored_by_flat_bio": ignored_overlaps,
+                },
+                ensure_ascii=False,
+            )
+        )
 
 
 def train(config_path: Path) -> None:
     import numpy as np
     from datasets import Dataset
-
     from transformers import (
         AutoModelForTokenClassification,
         AutoTokenizer,
@@ -65,15 +70,15 @@ def train(config_path: Path) -> None:
     }
     tokenizer = AutoTokenizer.from_pretrained(config["model_name"], use_fast=True)
     if not tokenizer.is_fast:
-        raise RuntimeError("A fast tokenizer is required for word_ids-based label alignment")
+        raise RuntimeError(
+            "A fast tokenizer is required for word_ids-based label alignment"
+        )
 
     def prepare(rows):
-        dataset = Dataset.from_list(rows)
-        return dataset.map(
-            lambda example: encode_example(example, tokenizer, config["max_length"]),
-            remove_columns=dataset.column_names,
-            desc="Tokenizing and aligning labels",
-        )
+        encoded_rows = [
+            encode_example(row, tokenizer, config["max_length"]) for row in rows
+        ]
+        return Dataset.from_list(encoded_rows)
 
     train_dataset = prepare(train_rows)
     dev_dataset = prepare(dev_rows)
@@ -127,12 +132,15 @@ def train(config_path: Path) -> None:
     gold_ids = prediction_result.label_ids
     saved_predictions = {
         "predictions": [
-            [int(pred) for pred, gold in zip(pred_row, gold_row, strict=True) if gold != -100]
+            [
+                int(pred)
+                for pred, gold in zip(pred_row, gold_row, strict=True)
+                if gold != -100
+            ]
             for pred_row, gold_row in zip(predicted_ids, gold_ids, strict=True)
         ],
         "labels": [
-            [int(gold) for gold in gold_row if gold != -100]
-            for gold_row in gold_ids
+            [int(gold) for gold in gold_row if gold != -100] for gold_row in gold_ids
         ],
     }
     predictions_path = output_dir / "dev_predictions.json"
@@ -155,8 +163,9 @@ def train(config_path: Path) -> None:
     (output_dir / "config.json").write_text(
         json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    import torch
     from importlib.metadata import version
+
+    import torch
 
     environment = {
         "python": sys.version,
@@ -179,17 +188,25 @@ def train(config_path: Path) -> None:
 
 def reevaluate(predictions_path: Path) -> None:
     payload = json.loads(predictions_path.read_text(encoding="utf-8"))
-    metrics = compute_entity_metrics(payload["predictions"], payload["labels"], ID_TO_LABEL)
+    metrics = compute_entity_metrics(
+        payload["predictions"], payload["labels"], ID_TO_LABEL
+    )
     print(json.dumps(metrics, ensure_ascii=False, indent=2))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("audit", help="validate local data and report split statistics")
-    train_parser = subparsers.add_parser("train", help="fine-tune BERT and evaluate on dev")
+    subparsers.add_parser(
+        "audit", help="validate local data and report split statistics"
+    )
+    train_parser = subparsers.add_parser(
+        "train", help="fine-tune BERT and evaluate on dev"
+    )
     train_parser.add_argument("--config", type=Path, default=ROOT / "config.json")
-    evaluate_parser = subparsers.add_parser("evaluate", help="recompute entity metrics from saved predictions")
+    evaluate_parser = subparsers.add_parser(
+        "evaluate", help="recompute entity metrics from saved predictions"
+    )
     evaluate_parser.add_argument("predictions", type=Path)
     args = parser.parse_args()
     if args.command == "audit":

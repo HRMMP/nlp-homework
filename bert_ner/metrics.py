@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def compute_entity_metrics(
@@ -27,7 +27,34 @@ def compute_entity_metrics(
         true_sequences.append(true_tags)
         predicted_sequences.append(predicted_tags)
     return {
-        "precision": float(precision_score(true_sequences, predicted_sequences, average="micro", mode="strict", scheme=IOB2, zero_division=0)),
-        "recall": float(recall_score(true_sequences, predicted_sequences, average="micro", mode="strict", scheme=IOB2, zero_division=0)),
-        "f1": float(f1_score(true_sequences, predicted_sequences, average="micro", mode="strict", scheme=IOB2, zero_division=0)),
+        "precision": float(
+            precision_score(
+                true_sequences,
+                predicted_sequences,
+                average="micro",
+                mode="strict",
+                scheme=IOB2,
+                zero_division=0,
+            )
+        ),
+        "recall": float(
+            recall_score(
+                true_sequences,
+                predicted_sequences,
+                average="micro",
+                mode="strict",
+                scheme=IOB2,
+                zero_division=0,
+            )
+        ),
+        "f1": float(
+            f1_score(
+                true_sequences,
+                predicted_sequences,
+                average="micro",
+                mode="strict",
+                scheme=IOB2,
+                zero_division=0,
+            )
+        ),
     }
