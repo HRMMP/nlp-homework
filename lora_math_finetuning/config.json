@@ -1,0 +1,32 @@
+{
+  "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "dataset_name": "openai/gsm8k",
+  "dataset_config": "main",
+  "dataset_revision": "740312add88f781978c0658806c59bc2815b9866",
+  "validation_ratio": 0.1,
+  "system_prompt": "You are a careful math tutor. Solve the problem step by step. On the final line, write the answer in the exact format `#### <number>`, matching the GSM8K answer format.",
+  "prompt_template": "Question:\n{question}",
+  "max_length": 1024,
+  "max_new_tokens": 512,
+  "train_batch_size": 2,
+  "eval_batch_size": 2,
+  "generation_batch_size": 8,
+  "gradient_accumulation_steps": 8,
+  "learning_rate": 0.0002,
+  "epochs": 1,
+  "weight_decay": 0.01,
+  "warmup_ratio": 0.03,
+  "logging_steps": 10,
+  "save_total_limit": 2,
+  "seed": 42,
+  "output_dir": "lora_math_finetuning/outputs/qwen2.5-1.5b-gsm8k",
+  "lora": {
+    "r": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "target_modules": ["q_proj", "v_proj"],
+    "bias": "none",
+    "task_type": "CAUSAL_LM"
+  }
+}
