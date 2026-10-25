@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import os
 import platform
 import random
 import time
@@ -164,7 +166,7 @@ def run_training(args: argparse.Namespace) -> Path:
     from machine_translation.data import (
         TranslationDataset,
         collate_translation,
-        load_opus_books_splits,
+        load_translation_splits,
         train_sentencepiece_tokenizer,
     )
     from machine_translation.model import TransformerSeq2Seq
@@ -191,15 +193,7 @@ def run_training(args: argparse.Namespace) -> Path:
         raise FileExistsError(f"output directory is not empty: {output_dir}")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    splits = load_opus_books_splits(
-        dataset_name=config["dataset_name"],
-        language_pair=config["language_pair"],
-        seed=seed,
-        max_examples=config["max_examples"],
-        train_ratio=config["train_ratio"],
-        validation_ratio=config["validation_ratio"],
-        dataset_revision=config["dataset_revision"],
-    )
+    splits = load_translation_splits(config)
     if not splits["train"] or not splits["validation"] or not splits["test"]:
         raise ValueError(
             "dataset split is empty; increase max_examples or adjust split ratios"
@@ -222,7 +216,13 @@ def run_training(args: argparse.Namespace) -> Path:
                 "test": 1.0 - config["train_ratio"] - config["validation_ratio"],
             },
             "split_sizes": {name: len(rows) for name, rows in splits.items()},
-            "split_order": "seeded shuffle, then contiguous train/validation/test slices",
+            "split_order": (
+                "immutable prepared connected-group split"
+                if config.get("prepared_data_dir")
+                else "seeded shuffle, then contiguous train/validation/test slices"
+            ),
+            "prepared_data_dir": config.get("prepared_data_dir"),
+            "prepared_manifest_sha256": config.get("prepared_manifest_sha256"),
         },
     )
 
@@ -240,7 +240,29 @@ def run_training(args: argparse.Namespace) -> Path:
             "device": str(device),
             "cuda_available": torch.cuda.is_available(),
             "cuda_version": torch.version.cuda,
+            "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
+            "gpu_name": torch.cuda.get_device_name(device)
+            if device.type == "cuda"
+            else None,
             "seed": seed,
+        },
+    )
+    snapshot_files = [
+        "data.py",
+        "prepare.py",
+        "train.py",
+        "evaluate.py",
+        "model.py",
+        "score.py",
+        "requirements.txt",
+    ]
+    _write_json(
+        output_dir / "code_snapshot.json",
+        {
+            name: hashlib.sha256(
+                (Path(__file__).parent / name).read_bytes()
+            ).hexdigest()
+            for name in snapshot_files
         },
     )
 

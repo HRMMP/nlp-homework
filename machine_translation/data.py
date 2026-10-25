@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import random
+from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
+from itertools import combinations
 from pathlib import Path
 from typing import Any
 
@@ -84,6 +88,102 @@ def load_opus_books_splits(
         "train": pairs[:train_end],
         "validation": pairs[train_end:validation_end],
         "test": pairs[validation_end:],
+    }
+
+
+def load_translation_splits(
+    config: Mapping[str, Any],
+) -> dict[str, list[dict[str, str]]]:
+    """Load immutable prepared files, or preserve the original OPUS loading path."""
+    if not config.get("prepared_data_dir"):
+        return load_opus_books_splits(
+            config["dataset_name"],
+            config["language_pair"],
+            config["seed"],
+            config["max_examples"],
+            config["train_ratio"],
+            config["validation_ratio"],
+            config["dataset_revision"],
+        )
+    directory = Path(config["prepared_data_dir"])
+    if not directory.is_absolute():
+        directory = Path(__file__).resolve().parents[1] / directory
+    manifest_bytes = (directory / "manifest.json").read_bytes()
+    expected = config.get("prepared_manifest_sha256")
+    if not expected or hashlib.sha256(manifest_bytes).hexdigest() != expected:
+        raise ValueError("Prepared data manifest checksum mismatch or missing pin")
+    manifest = json.loads(manifest_bytes)
+    for field in ("dataset_name", "dataset_revision", "language_pair"):
+        if manifest[field] != config[field]:
+            raise ValueError(
+                f"Prepared data {field} differs from training configuration"
+            )
+    splits = {}
+    for name in ("train", "validation", "test"):
+        spec = manifest["files"][name]
+        data = (directory / spec["file"]).read_bytes()
+        if hashlib.sha256(data).hexdigest() != spec["sha256"]:
+            raise ValueError(f"Prepared {name} file checksum mismatch")
+        rows = [
+            json.loads(line)
+            for line in data.decode("utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(rows) != spec["count"]:
+            raise ValueError(f"Prepared {name} row count mismatch")
+        if any(
+            not isinstance(row.get(side), str) or not row[side].strip()
+            for row in rows
+            for side in ("src", "tgt")
+        ):
+            raise ValueError(f"Prepared {name} contains an empty or invalid sentence")
+        splits[name] = rows
+    cap = config.get("max_examples")
+    if cap is not None and cap < sum(map(len, splits.values())):
+        sizes = {
+            "train": int(cap * config["train_ratio"]),
+            "validation": int(cap * config["validation_ratio"]),
+        }
+        sizes["test"] = cap - sum(sizes.values())
+        splits = {name: rows[: sizes[name]] for name, rows in splits.items()}
+    return splits
+
+
+def audit_split_overlap(
+    splits: Mapping[str, Sequence[Mapping[str, str]]],
+) -> dict[str, Any]:
+    """Count exact duplicates without normalizing, filtering, or changing splits."""
+    counts = {
+        name: {
+            "pair": Counter((row["src"], row["tgt"]) for row in rows),
+            "source": Counter(row["src"] for row in rows),
+            "target": Counter(row["tgt"] for row in rows),
+        }
+        for name, rows in splits.items()
+    }
+    overlaps = {}
+    for left, right in combinations(counts, 2):
+        fields = {}
+        for field in ("pair", "source", "target"):
+            shared = counts[left][field].keys() & counts[right][field].keys()
+            fields[field] = {
+                "shared_unique_keys": len(shared),
+                "left_occurrences": sum(counts[left][field][key] for key in shared),
+                "right_occurrences": sum(counts[right][field][key] for key in shared),
+            }
+        overlaps[f"{left}/{right}"] = fields
+    return {
+        "scope": "Exact text only; not language identification or semantic alignment",
+        "split_sizes": {name: len(rows) for name, rows in splits.items()},
+        "within_split_duplicates_beyond_first": {
+            name: {field: sum(c.values()) - len(c) for field, c in fields.items()}
+            for name, fields in counts.items()
+        },
+        "cross_split": overlaps,
+        "identical_source_target": {
+            name: sum(row["src"] == row["tgt"] for row in rows)
+            for name, rows in splits.items()
+        },
     }
 
 

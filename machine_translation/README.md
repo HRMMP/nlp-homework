@@ -1,6 +1,52 @@
 # 机器翻译实验
 
-本实验使用 PyTorch Encoder-Decoder Transformer 完成英译法，数据集为 OPUS Books。目录中提供数据准备、训练、贪心解码、SacreBLEU 独立计分和最小测试入口。正式训练和测试集评估尚未运行，因此仓库没有预填 BLEU 或模型效果结论。
+本实验使用 PyTorch Encoder-Decoder Transformer 完成英译法，数据集为 OPUS Books。目录中提供数据准备、训练、贪心解码、SacreBLEU 独立计分和最小测试入口。旧运行的 6,355 条测试预测 BLEU 为 13.78，但存在语向、疑似错配和跨集合精确重复。本轮已完成语言筛查和分组去重后的 12 轮重训：5,008 条新测试预测 BLEU 13.69、chrF++ 38.48；新旧测试集不同，不能按分差声称模型改进。自动筛查不保证语义对齐，抽样记录仍须学生核验。
+
+## 语言筛查与分组去重版
+
+`configs/clean_data.json` 固定清洗规则和 fastText `lid.176.ftz` 模型 SHA-256：NFKC/空白归一化，两侧至少 10 个字母、最多 500 字符，字符长度比不超过 4，预测语向须为 en/fr 且两侧概率至少 0.8；排除完全相同文本，在切分前精确句对去重，并将同源或同目标的连通组放在同一集合。不依据模型预测得分清洗，不自动交换反向句对。模型来源及 CC-BY-SA-3.0 许可见 [fastText 官方页面](https://fasttext.cc/docs/en/language-identification.html)。
+
+127,085 对中保留 100,141 对，train/validation/test=90,126/5,007/5,008；跨集合精确句对、源句、目标句交集均为 0。完整规则排除计数、固定随机抽样和各文件 SHA-256 保存在 `outputs/en-fr-clean-data-v1/manifest.json`，重建结果逐文件一致。没有按书籍隔离，也没有完成近重复或全量人工语义审计。
+
+从根目录复现数据准备时使用新的输出目录和训练配置文件（命令拒绝覆盖）：
+
+```bash
+mkdir -p machine_translation/outputs/resources
+curl -fL https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz \
+  -o machine_translation/outputs/resources/lid.176.ftz
+python -m machine_translation.prepare \
+  --config machine_translation/configs/clean_data.json \
+  --output-dir machine_translation/outputs/reproduce-clean-data \
+  --training-config-output machine_translation/outputs/reproduce-clean-config.json
+```
+
+`fasttext-wheel` 仅用于预处理；批量预测兼容本机 NumPy 2。训练与评价使用生成的、固定 manifest 哈希的配置，从已准备文件读取，不重新联网切分。
+
+```bash
+python scripts/run_on_idle_gpu.py \
+  --record machine_translation/outputs/reproduce-clean-train.job.json \
+  --log machine_translation/outputs/reproduce-clean-train.log -- \
+  python -m machine_translation.train \
+  --config machine_translation/outputs/reproduce-clean-config.json \
+  --device cuda:0 --output-dir machine_translation/outputs/reproduce-clean-run
+python scripts/run_on_idle_gpu.py \
+  --record machine_translation/outputs/reproduce-clean-test.job.json \
+  --log machine_translation/outputs/reproduce-clean-test.log -- \
+  python -m machine_translation.evaluate \
+  --run-dir machine_translation/outputs/reproduce-clean-run \
+  --split test --batch-size 64 --device cuda:0
+```
+
+选择器要求显存不超过 256 MiB、利用率不超过 5%、无计算进程，并间隔两秒复查；按物理 UUID 设置 `CUDA_VISIBLE_DEVICES`，进程内统一用 `cuda:0`。锁只协调本用户的启动，不替代集群调度或保证其他用户不会随后使用该卡。四次本轮 GPU 任务均正常退出，记录在 `outputs/clean-v1-*.job.json`，没有停止其他用户的进程。
+
+本机正式产物为 `outputs/en-fr-clean-v1-seed42/`：两步 smoke、完整 12 轮训练、完整测试和独立评分均已执行。参数与旧全量模型一致（11,682,624 参数）；最佳 epoch=12，验证 loss=2.4438。`code_snapshot.json` 记录相关源码 SHA-256。新测试有 7 条 source、25 条 target 按当前 tokenizer/长度规则会截断；参考译文仍保留完整文本，未删去这些记录。
+
+```bash
+CUDA_VISIBLE_DEVICES='' python reports/verify_results.py --audit-cached-mt \
+  --clean-mt-run machine_translation/outputs/en-fr-clean-v1-seed42
+```
+
+新结果与训练曲线分别在 `reports/evidence/results.json` 的 `translation_clean` 和 `reports/evidence/translation_clean_loss.csv`；JSON 含前 10 条系统抽样译例，尚未经过学生人工核验。旧运行与旧数据保持不变。以下保留原始加载入口，勿将原始配置与清洗版混同。
 
 ## 实验方案
 
@@ -91,7 +137,15 @@ python -m compileall -q machine_translation
 ruff check machine_translation
 ```
 
-没有安装 PyTorch 时，纯数据切分、预测文件和部分 tokenizer 测试仍可运行；涉及 batch padding 或模型的测试会明确跳过。本次开发在临时依赖目录中完成了 16 个测试、固定 revision 的数据/tokenizer 验证，以及 2 个 optimizer batch 的 smoke 训练、测试集生成和独立 BLEU 复算。该 smoke 输出不代表正式实验结果；正式训练、完整测试集评估及真实错误分析仍待学生按实际资源运行后补充。
+没有安装 PyTorch 时，纯数据切分、预测文件和部分 tokenizer 测试仍可运行；涉及 batch padding 或模型的测试会明确跳过。早期开发已完成 2 个 optimizer batch 的 smoke 链路；本机后续正式运行产物位于 `outputs/en-fr-full-seed42/`，与 smoke 结果分开保存。
+
+可用本地缓存重建原切分并审计精确重复，无须加载模型：
+
+```bash
+CUDA_VISIBLE_DEVICES='' python reports/verify_results.py --audit-cached-mt
+```
+
+`data.audit_split_overlap()` 只计数，不修改文本或切分。本次发现 45 个 train/test 共有句对键，在 test 中出现 52 次；对应结构化结果见 `reports/evidence/results.json`。这是精确重复审计，不是完整语言识别、近重复或语义对齐检查；新清洗规则需要在重新切分和训练前确认，不能通过事后只删除测试难例改善原分数。
 
 ## 文件结构
 

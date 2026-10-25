@@ -61,7 +61,7 @@ def evaluate_run(args: argparse.Namespace) -> tuple[Path, Path]:
     from machine_translation.data import (
         TranslationDataset,
         collate_translation,
-        load_opus_books_splits,
+        load_translation_splits,
     )
     from machine_translation.model import greedy_decode
     from machine_translation.score import score_records
@@ -78,15 +78,7 @@ def evaluate_run(args: argparse.Namespace) -> tuple[Path, Path]:
             "--split must be 'validation' or 'test'; training data is never scored"
         )
 
-    splits = load_opus_books_splits(
-        dataset_name=config["dataset_name"],
-        language_pair=config["language_pair"],
-        seed=config["seed"],
-        max_examples=config["max_examples"],
-        train_ratio=config["train_ratio"],
-        validation_ratio=config["validation_ratio"],
-        dataset_revision=config["dataset_revision"],
-    )
+    splits = load_translation_splits(config)
     pairs = splits[args.split]
     if args.limit is not None:
         if args.limit < 1:

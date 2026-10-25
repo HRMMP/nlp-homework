@@ -1,0 +1,18 @@
+{
+  "dataset_name": "Helsinki-NLP/opus_books",
+  "dataset_revision": "1f9f6191d0e91a3c539c2595e2fe48fc1420de9b",
+  "language_model_path": "machine_translation/outputs/resources/lid.176.ftz",
+  "language_model_sha256": "8f3472cfe8738a7b6099e8e999c3cbfae0dcd15696aac7d7738a8039db603e83",
+  "language_batch_size": 2048,
+  "split_seed": 42,
+  "review_seed": 42,
+  "train_ratio": 0.9,
+  "validation_ratio": 0.05,
+  "base_training_config": "machine_translation/configs/en_fr_full.json",
+  "policy": {
+    "min_alpha_chars": 10,
+    "max_chars": 500,
+    "max_length_ratio": 4.0,
+    "min_language_probability": 0.8
+  }
+}

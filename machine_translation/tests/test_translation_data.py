@@ -5,7 +5,11 @@ import types
 import unittest
 from unittest.mock import patch
 
-from machine_translation.data import collate_translation, load_opus_books_splits
+from machine_translation.data import (
+    audit_split_overlap,
+    collate_translation,
+    load_opus_books_splits,
+)
 
 
 class TranslationSplitTests(unittest.TestCase):
@@ -65,6 +69,62 @@ class TranslationSplitTests(unittest.TestCase):
             )
         self.assertEqual(
             calls, [("Helsinki-NLP/opus_books", "en-fr", {"revision": "abc123"})]
+        )
+
+
+class TranslationOverlapTests(unittest.TestCase):
+    def test_distinguishes_unique_pairs_and_duplicate_occurrences(self):
+        pair = {"src": "hello", "tgt": "bonjour"}
+        splits = {
+            "train": [pair, pair, {"src": "hello", "tgt": "salut"}],
+            "test": [pair, pair, {"src": "other", "tgt": "bonjour"}],
+        }
+        result = audit_split_overlap(splits)
+        self.assertEqual(
+            result["within_split_duplicates_beyond_first"]["train"],
+            {
+                "pair": 1,
+                "source": 2,
+                "target": 1,
+            },
+        )
+        self.assertEqual(
+            result["cross_split"]["train/test"]["pair"],
+            {
+                "shared_unique_keys": 1,
+                "left_occurrences": 2,
+                "right_occurrences": 2,
+            },
+        )
+        self.assertEqual(
+            result["cross_split"]["train/test"]["source"]["left_occurrences"], 3
+        )
+        self.assertEqual(
+            result["cross_split"]["train/test"]["target"]["right_occurrences"], 3
+        )
+        self.assertEqual(len(splits["train"]), 3)
+
+    def test_does_not_silently_normalize_text(self):
+        result = audit_split_overlap(
+            {
+                "train": [{"src": "Hello", "tgt": "Bonjour"}],
+                "test": [{"src": "hello", "tgt": "Bonjour "}],
+            }
+        )
+        self.assertEqual(
+            result["cross_split"]["train/test"]["pair"]["shared_unique_keys"], 0
+        )
+
+    def test_empty_split_and_identical_text(self):
+        result = audit_split_overlap(
+            {
+                "train": [{"src": "42", "tgt": "42"}],
+                "test": [],
+            }
+        )
+        self.assertEqual(result["identical_source_target"], {"train": 1, "test": 0})
+        self.assertEqual(
+            result["cross_split"]["train/test"]["pair"]["right_occurrences"], 0
         )
 
 
